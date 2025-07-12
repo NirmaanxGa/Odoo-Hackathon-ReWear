@@ -31,10 +31,10 @@ const ItemCard = ({ item }) => {
           />
           {/* Price overlay */}
           <div className="absolute top-2 left-2">
-            <div className="bg-white bg-opacity-90 px-2 py-1 text-xs font-medium">
+            <div className="bg-white bg-opacity-95 px-2 py-1 text-xs font-semibold rounded shadow-sm">
               ₹{price}
               {originalPrice > price && (
-                <span className="text-gray-500 line-through ml-1">
+                <span className="text-gray-500 line-through ml-1 text-xs">
                   ₹{originalPrice}
                 </span>
               )}
@@ -42,15 +42,15 @@ const ItemCard = ({ item }) => {
           </div>
 
           {/* Available options */}
-          <div className="absolute top-2 right-2 space-y-1">
+          <div className="absolute top-2 right-2 flex gap-1">
             {availableFor.purchase && (
-              <div className="bg-green-100 text-green-800 px-2 py-1 text-xs font-medium rounded">
+              <div className="bg-black text-white px-2 py-0.5 text-xs font-medium rounded">
                 BUY
               </div>
             )}
             {availableFor.exchange && (
-              <div className="bg-orange-100 text-orange-800 px-2 py-1 text-xs font-medium rounded">
-                EXCHANGE
+              <div className="bg-white text-black border border-black px-2 py-0.5 text-xs font-medium rounded">
+                SWAP
               </div>
             )}
           </div>
@@ -59,10 +59,10 @@ const ItemCard = ({ item }) => {
           {status !== "available" && (
             <div className="absolute bottom-2 left-2">
               <span
-                className={`px-2 py-1 text-xs font-medium rounded ${
+                className={`px-2 py-0.5 text-xs font-medium rounded shadow-sm ${
                   status === "reserved"
-                    ? "bg-yellow-100 text-yellow-800"
-                    : "bg-red-100 text-red-800"
+                    ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
+                    : "bg-red-100 text-red-800 border border-red-200"
                 }`}
               >
                 {status === "reserved" ? "Reserved" : "Sold"}

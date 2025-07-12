@@ -44,20 +44,30 @@ export const UserProvider = ({ children }) => {
   };
 
   const addPurchase = (item) => {
-    setPurchaseHistory((prev) => [
-      ...prev,
-      {
-        ...item,
-        purchaseDate: new Date().toISOString(),
-        pointsEarned: 200,
-      },
-    ]);
-    // Add 200 points for each purchase
+    const purchase = {
+      ...item,
+      purchaseDate: new Date().toISOString(),
+      pointsEarned: 200,
+      transactionId: `TXN_${Date.now()}`,
+      paymentStatus: "completed",
+    };
+
+    setPurchaseHistory((prev) => [purchase, ...prev]); // Add to beginning for latest first
+    // Add 200 points for each purchase immediately
     setPointsBalance((prev) => prev + 200);
+
+    return purchase; // Return for immediate feedback
   };
 
   const addExchange = (exchange) => {
-    setExchangeHistory((prev) => [...prev, exchange]);
+    const exchangeWithId = {
+      ...exchange,
+      id: `EX_${Date.now()}`,
+      timestamp: new Date().toISOString(),
+    };
+
+    setExchangeHistory((prev) => [exchangeWithId, ...prev]); // Add to beginning for latest first
+    return exchangeWithId; // Return for immediate feedback
   };
 
   const redeemReward = (reward) => {

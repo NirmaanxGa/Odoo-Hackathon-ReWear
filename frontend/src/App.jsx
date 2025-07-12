@@ -1,16 +1,18 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 // Context
 import { UserProvider } from "./context/UserContext";
+import { LoadingProvider, useLoading } from "./context/LoadingContext";
 
 // Components
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ScrollToTop from "./components/ScrollToTop";
+import LottieLoader from "./components/LottieLoader";
 
 // Pages
 import Home from "./pages/Home";
@@ -23,9 +25,12 @@ import Cart from "./pages/Cart";
 import History from "./pages/History";
 import Rewards from "./pages/Rewards";
 
-const App = () => {
+const AppContent = () => {
+  const { isLoading: dynamicLoading } = useLoading();
+
   return (
-    <UserProvider>
+    <>
+      {dynamicLoading && <LottieLoader />}
       <div className="min-h-screen flex flex-col">
         <ScrollToTop />
         <Navbar />
@@ -79,18 +84,73 @@ const App = () => {
         {/* Toast Notifications */}
         <ToastContainer
           position="top-right"
-          autoClose={5000}
+          autoClose={4000}
           hideProgressBar={false}
-          newestOnTop={false}
+          newestOnTop={true}
           closeOnClick
           rtl={false}
           pauseOnFocusLoss
           draggable
           pauseOnHover
           theme="light"
+          style={{
+            fontSize: "14px",
+          }}
+          toastStyle={{
+            borderRadius: "8px",
+            boxShadow: "0 10px 25px rgba(0, 0, 0, 0.1)",
+          }}
         />
       </div>
-    </UserProvider>
+    </>
+  );
+};
+
+const App = () => {
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if this is a page refresh
+    const isRefresh =
+      performance.navigation.type === performance.navigation.TYPE_RELOAD ||
+      sessionStorage.getItem("isRefresh") === "true";
+
+    if (isRefresh) {
+      sessionStorage.setItem("isRefresh", "false");
+    }
+
+    // Simulate app initialization/loading
+    const timer = setTimeout(
+      () => {
+        setIsInitialLoading(false);
+      },
+      isRefresh ? 3000 : 2500
+    ); // Longer loading for refresh
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Listen for page refresh
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      sessionStorage.setItem("isRefresh", "true");
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, []);
+
+  // Show Lottie loader while app is loading initially
+  if (isInitialLoading) {
+    return <LottieLoader />;
+  }
+
+  return (
+    <LoadingProvider>
+      <UserProvider>
+        <AppContent />
+      </UserProvider>
+    </LoadingProvider>
   );
 };
 

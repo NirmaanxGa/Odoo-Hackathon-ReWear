@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import ItemCard from "../components/ItemCard";
+import ScrollVelocity from "../animations/ScrollVelocity";
 import {
   assets,
   featuredItems,
@@ -41,14 +42,6 @@ const Home = () => {
               >
                 BROWSE ITEMS
               </Link>
-              {isSignedIn && (
-                <Link
-                  to="/add-item"
-                  className="bg-gray-100 text-gray-900 px-8 py-3 text-sm font-medium hover:bg-gray-200 transition-colors text-center"
-                >
-                  LIST AN ITEM
-                </Link>
-              )}
             </div>
           </div>
           <div className="hidden lg:block">
@@ -133,7 +126,13 @@ const Home = () => {
             </div>
             <div className="space-y-4">
               <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
-                <span className="text-2xl">🌱</span>
+                <svg
+                  className="w-8 h-8 text-black"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8,20C19,20 22,3 22,3C21,5 14,5.25 9,6.25C4,7.25 2,11.5 2,13.5C2,15.5 3.75,17.25 3.75,17.25C7,8 17,8 17,8Z" />
+                </svg>
               </div>
               <h3 className="text-lg font-medium text-gray-900">
                 Sustainable Fashion
@@ -146,27 +145,16 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Newsletter */}
-      <section className="py-16 bg-black text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-light mb-4">
-            Subscribe now & get 20% off
-          </h2>
-          <p className="text-gray-300 mb-8 max-w-md mx-auto">
-            Join our community and get exclusive access to new arrivals and
-            special offers
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="flex-1 px-4 py-3 text-black text-sm focus:outline-none"
-            />
-            <button className="bg-white text-black px-8 py-3 text-sm font-medium hover:bg-gray-100 transition-colors">
-              SUBSCRIBE
-            </button>
-          </div>
-        </div>
+      {/* Scroll Velocity Animation */}
+      <section className="py-16 bg-black text-white overflow-hidden">
+        <ScrollVelocity
+          texts={["ReWear Community", "Sustainable Fashion"]}
+          velocity={50}
+          className="text-white opacity-80"
+          parallaxClassName="h-24"
+          scrollerClassName="text-2xl md:text-4xl font-light tracking-wider"
+          numCopies={4}
+        />
       </section>
     </div>
   );

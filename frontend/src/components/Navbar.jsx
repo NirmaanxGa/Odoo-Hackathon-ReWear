@@ -7,6 +7,7 @@ const Navbar = () => {
   const { isSignedIn } = useAuth();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showCollectionDropdown, setShowCollectionDropdown] = useState(false);
 
   const isActive = (path) => {
     return location.pathname === path
@@ -35,14 +36,66 @@ const Navbar = () => {
             >
               HOME
             </Link>
-            <Link
-              to="/browse"
-              className={`py-2 px-1 text-sm font-medium transition-colors ${isActive(
-                "/browse"
-              )}`}
+
+            {/* Collections Dropdown */}
+            <div
+              className="relative"
+              onMouseEnter={() => setShowCollectionDropdown(true)}
+              onMouseLeave={() => setShowCollectionDropdown(false)}
             >
-              COLLECTION
-            </Link>
+              <Link
+                to="/browse"
+                className={`py-2 px-1 text-sm font-medium transition-colors flex items-center ${isActive(
+                  "/browse"
+                )}`}
+              >
+                COLLECTION
+                <svg
+                  className="ml-1 h-4 w-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </Link>
+
+              {showCollectionDropdown && (
+                <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 shadow-lg z-50">
+                  <Link
+                    to="/browse?category=mens"
+                    className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Men's Collection
+                  </Link>
+                  <Link
+                    to="/browse?category=womens"
+                    className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Women's Collection
+                  </Link>
+                  <Link
+                    to="/browse?category=kids"
+                    className="block px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    Kids Collection
+                  </Link>
+                  <div className="border-t border-gray-200">
+                    <Link
+                      to="/browse"
+                      className="block px-4 py-3 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors"
+                    >
+                      View All Items
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
             <Link
               to="/dashboard"
               className={`py-2 px-1 text-sm font-medium transition-colors ${isActive(
@@ -77,13 +130,8 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Right side - Search, Cart, User */}
+          {/* Right side - Cart, User */}
           <div className="flex items-center space-x-4">
-            {/* Search Icon */}
-            <button className="text-gray-600 hover:text-gray-900">
-              <img src={assets.search_icon} alt="Search" className="w-5 h-5" />
-            </button>
-
             {/* Cart Icon with count */}
             <Link
               to="/cart"

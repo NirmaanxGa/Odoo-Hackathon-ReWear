@@ -7,7 +7,8 @@ import ItemCard from "../components/ItemCard";
 const Dashboard = () => {
   const { isSignedIn } = useAuth();
   const { user } = useUser();
-  const { uploadedItems, swapHistory } = useUserContext();
+  const { uploadedItems, swapHistory, pointsBalance, ongoingSwaps } =
+    useUserContext();
   const [activeTab, setActiveTab] = useState("overview");
 
   // If not signed in, show login prompt
@@ -31,10 +32,10 @@ const Dashboard = () => {
   }
 
   const stats = {
-    totalUploads: uploadedItems.length + 5,
-    totalExchanges: swapHistory.length + 3,
-    totalViews: 247,
-    totalContacts: 12,
+    totalUploads: uploadedItems.length,
+    totalSwaps: swapHistory.length,
+    pointsBalance: pointsBalance,
+    ongoingSwaps: ongoingSwaps.length,
   };
 
   // Dummy uploaded items
@@ -105,25 +106,25 @@ const Dashboard = () => {
             <div className="text-2xl font-light text-gray-900 mb-1">
               {stats.totalUploads}
             </div>
-            <div className="text-sm text-gray-600">Items Shared</div>
+            <div className="text-sm text-gray-600">Items Listed</div>
           </div>
           <div className="bg-gray-50 p-6 text-center">
             <div className="text-2xl font-light text-gray-900 mb-1">
-              {stats.totalExchanges}
+              {stats.totalSwaps}
             </div>
-            <div className="text-sm text-gray-600">Exchanges</div>
+            <div className="text-sm text-gray-600">Swaps Completed</div>
           </div>
           <div className="bg-gray-50 p-6 text-center">
             <div className="text-2xl font-light text-gray-900 mb-1">
-              {stats.totalViews}
+              {stats.pointsBalance}
             </div>
-            <div className="text-sm text-gray-600">Profile Views</div>
+            <div className="text-sm text-gray-600">Points Balance</div>
           </div>
           <div className="bg-gray-50 p-6 text-center">
             <div className="text-2xl font-light text-gray-900 mb-1">
-              {stats.totalContacts}
+              {stats.ongoingSwaps}
             </div>
-            <div className="text-sm text-gray-600">Messages</div>
+            <div className="text-sm text-gray-600">Ongoing Swaps</div>
           </div>
         </div>
 

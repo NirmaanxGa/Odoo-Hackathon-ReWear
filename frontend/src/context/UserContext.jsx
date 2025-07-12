@@ -14,25 +14,65 @@ export const useUserContext = () => {
 export const UserProvider = ({ children }) => {
   const { user, isLoaded } = useUser();
   const [userRole, setUserRole] = useState("user");
-  const [uploadedItems, setUploadedItems] = useState([]);
-  const [swapHistory, setSwapHistory] = useState([]);
-  const [pointsBalance, setPointsBalance] = useState(245);
-  const [ongoingSwaps, setOngoingSwaps] = useState([]);
+  const [uploadedItems, setUploadedItems] = useState([
+    // Mock uploaded items for testing exchange functionality
+    // Remove these items to test the "no items" flow
+    {
+      id: "user_item_1",
+      title: "My Vintage Jacket",
+      image: "https://via.placeholder.com/300x400?text=My+Jacket",
+      size: "L",
+      condition: "Excellent",
+      price: 299,
+    },
+    {
+      id: "user_item_2",
+      title: "My Designer Jeans",
+      image: "https://via.placeholder.com/300x400?text=My+Jeans",
+      size: "32",
+      condition: "Like New",
+      price: 199,
+    },
+  ]);
+  const [purchaseHistory, setPurchaseHistory] = useState([]);
+  const [exchangeHistory, setExchangeHistory] = useState([]);
+  const [pointsBalance, setPointsBalance] = useState(0); // Start with 0 points
+  const [rewardsRedeemed, setRewardsRedeemed] = useState([]);
 
   const addUploadedItem = (item) => {
     setUploadedItems((prev) => [...prev, item]);
   };
 
-  const addSwapHistory = (swap) => {
-    setSwapHistory((prev) => [...prev, swap]);
+  const addPurchase = (item) => {
+    setPurchaseHistory((prev) => [
+      ...prev,
+      {
+        ...item,
+        purchaseDate: new Date().toISOString(),
+        pointsEarned: 200,
+      },
+    ]);
+    // Add 200 points for each purchase
+    setPointsBalance((prev) => prev + 200);
   };
 
-  const updatePoints = (amount) => {
-    setPointsBalance((prev) => prev + amount);
+  const addExchange = (exchange) => {
+    setExchangeHistory((prev) => [...prev, exchange]);
   };
 
-  const addOngoingSwap = (swap) => {
-    setOngoingSwaps((prev) => [...prev, swap]);
+  const redeemReward = (reward) => {
+    if (pointsBalance >= reward.pointsRequired) {
+      setPointsBalance((prev) => prev - reward.pointsRequired);
+      setRewardsRedeemed((prev) => [
+        ...prev,
+        {
+          ...reward,
+          redeemedDate: new Date().toISOString(),
+        },
+      ]);
+      return true;
+    }
+    return false;
   };
 
   const value = {
@@ -42,12 +82,13 @@ export const UserProvider = ({ children }) => {
     setUserRole,
     uploadedItems,
     addUploadedItem,
-    swapHistory,
-    addSwapHistory,
+    purchaseHistory,
+    addPurchase,
+    exchangeHistory,
+    addExchange,
     pointsBalance,
-    updatePoints,
-    ongoingSwaps,
-    addOngoingSwap,
+    rewardsRedeemed,
+    redeemReward,
   };
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

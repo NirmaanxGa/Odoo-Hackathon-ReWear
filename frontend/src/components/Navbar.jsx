@@ -52,6 +52,14 @@ const Navbar = () => {
               DASHBOARD
             </Link>
             <Link
+              to="/rewards"
+              className={`py-2 px-1 text-sm font-medium transition-colors ${isActive(
+                "/rewards"
+              )}`}
+            >
+              REWARDS
+            </Link>
+            <Link
               to="/history"
               className={`py-2 px-1 text-sm font-medium transition-colors ${isActive(
                 "/history"
@@ -79,23 +87,21 @@ const Navbar = () => {
             {/* Cart Icon with count */}
             <Link
               to="/cart"
-              className="text-gray-600 hover:text-gray-900 relative"
+              className="relative text-gray-600 hover:text-gray-900"
             >
               <img src={assets.cart_icon} alt="Cart" className="w-5 h-5" />
-              <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                 0
               </span>
             </Link>
 
             {/* User Authentication */}
             {isSignedIn ? (
-              <div className="flex items-center space-x-2">
-                <UserButton afterSignOutUrl="/" />
-              </div>
+              <UserButton afterSignOutUrl="/" />
             ) : (
               <SignInButton mode="modal">
                 <button className="bg-black text-white px-4 py-2 text-sm font-medium hover:bg-gray-800 transition-colors">
-                  LOGIN
+                  SIGN IN
                 </button>
               </SignInButton>
             )}
@@ -112,49 +118,61 @@ const Navbar = () => {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 py-4">
-            <div className="flex flex-col space-y-4">
+          <div className="md:hidden">
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 border-t border-gray-200">
               <Link
                 to="/"
-                className="text-gray-600 hover:text-gray-900 text-sm font-medium"
+                className={`block px-3 py-2 text-sm font-medium ${isActive(
+                  "/"
+                )}`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 HOME
               </Link>
               <Link
                 to="/browse"
-                className="text-gray-600 hover:text-gray-900 text-sm font-medium"
+                className={`block px-3 py-2 text-sm font-medium ${isActive(
+                  "/browse"
+                )}`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 COLLECTION
               </Link>
               <Link
                 to="/dashboard"
-                className="text-gray-600 hover:text-gray-900 text-sm font-medium"
+                className={`block px-3 py-2 text-sm font-medium ${isActive(
+                  "/dashboard"
+                )}`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 DASHBOARD
               </Link>
               <Link
+                to="/rewards"
+                className={`block px-3 py-2 text-sm font-medium ${isActive(
+                  "/rewards"
+                )}`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                REWARDS
+              </Link>
+              <Link
                 to="/history"
-                className="text-gray-600 hover:text-gray-900 text-sm font-medium"
+                className={`block px-3 py-2 text-sm font-medium ${isActive(
+                  "/history"
+                )}`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 HISTORY
               </Link>
               <Link
                 to="/admin"
-                className="text-gray-600 hover:text-gray-900 text-sm font-medium"
+                className={`block px-3 py-2 text-sm font-medium ${isActive(
+                  "/admin"
+                )}`}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 ADMIN
-              </Link>
-              <Link
-                to="/cart"
-                className="text-gray-600 hover:text-gray-900 text-sm font-medium"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                CART
               </Link>
             </div>
           </div>

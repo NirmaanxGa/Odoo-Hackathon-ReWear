@@ -8,11 +8,12 @@ import { reWearItems } from "../assets/data";
 const ItemDetail = () => {
   const { id } = useParams();
   const { isSignedIn } = useAuth();
-  const { addSwapHistory, pointsBalance, updatePoints } = useUserContext();
+  const { addPurchase, addExchange, uploadedItems } = useUserContext();
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState("");
   const [showContactModal, setShowContactModal] = useState(false);
-  const [showSwapModal, setShowSwapModal] = useState(false);
+  const [showExchangeModal, setShowExchangeModal] = useState(false);
+  const [selectedExchangeItem, setSelectedExchangeItem] = useState("");
 
   // Find item by ID or use first item as fallback
   const item = reWearItems.find((item) => item.id === id) || reWearItems[0];
@@ -21,45 +22,59 @@ const ItemDetail = () => {
     setSelectedSize(size);
   };
 
-  const handleSwapRequest = () => {
+  const handlePurchase = () => {
     if (!isSignedIn) {
-      toast.error("Please sign in to request a swap");
+      toast.error("Please sign in to purchase");
       return;
     }
-    setShowSwapModal(true);
+
+    // Simulate Clerk payment process
+    toast.info("Redirecting to payment...");
+
+    // After successful payment, add to purchase history
+    setTimeout(() => {
+      addPurchase(item);
+      toast.success(`Purchase successful! You earned 200 points.`);
+    }, 2000);
   };
 
-  const handleRedeemWithPoints = () => {
+  const handleExchangeRequest = () => {
     if (!isSignedIn) {
-      toast.error("Please sign in to redeem with points");
+      toast.error("Please sign in to request an exchange");
       return;
     }
 
-    if (pointsBalance < item.pointsValue) {
-      toast.error(`Insufficient points. You need ${item.pointsValue} points.`);
+    // Check if user has uploaded any items
+    if (uploadedItems.length === 0) {
+      toast.error(
+        "You need to list at least one item before you can request exchanges. Please upload an item first."
+      );
       return;
     }
 
-    updatePoints(-item.pointsValue);
-    addSwapHistory({
-      type: "points-redemption",
-      item: item,
-      status: "completed",
-      pointsUsed: item.pointsValue,
-      date: new Date().toISOString(),
-    });
-    toast.success(`Item redeemed for ${item.pointsValue} points!`);
+    setShowExchangeModal(true);
   };
 
-  const submitSwapRequest = () => {
-    addSwapHistory({
-      type: "swap-request",
+  const submitExchangeRequest = () => {
+    if (!selectedExchangeItem) {
+      toast.error("Please select an item to exchange");
+      return;
+    }
+
+    const exchangeItem = uploadedItems.find(
+      (item) => item.id === selectedExchangeItem
+    );
+
+    addExchange({
+      type: "exchange-request",
       item: item,
+      exchangeItem: exchangeItem,
       status: "pending",
       date: new Date().toISOString(),
     });
-    setShowSwapModal(false);
-    toast.success("Swap request sent! The owner will be notified.");
+    setShowExchangeModal(false);
+    setSelectedExchangeItem("");
+    toast.success("Exchange request sent! The owner will be notified.");
   };
 
   const handleContactOwner = () => {
@@ -71,7 +86,7 @@ const ItemDetail = () => {
   };
 
   const submitContactRequest = () => {
-    addSwapHistory({
+    addExchange({
       type: "contact-request",
       item: item,
       status: "pending",
@@ -142,6 +157,23 @@ const ItemDetail = () => {
               <p className="text-gray-600">{item.description}</p>
             </div>
 
+            {/* Price */}
+            <div>
+              <div className="flex items-baseline space-x-2">
+                <span className="text-2xl font-light text-gray-900">
+                  ₹{item.price}
+                </span>
+                {item.originalPrice > item.price && (
+                  <span className="text-lg text-gray-500 line-through">
+                    ₹{item.originalPrice}
+                  </span>
+                )}
+              </div>
+              <p className="text-sm text-green-600 mt-1">
+                Earn 200 points with purchase
+              </p>
+            </div>
+
             {/* Size Selection */}
             <div>
               <h3 className="text-sm font-medium text-gray-900 mb-3">
@@ -174,21 +206,13 @@ const ItemDetail = () => {
                 <span className="text-gray-600">Category:</span>
                 <span className="font-medium">{item.category}</span>
               </div>
-              {item.pointsValue && (
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Points Value:</span>
-                  <span className="font-medium text-green-600">
-                    {item.pointsValue} points
-                  </span>
-                </div>
-              )}
               <div className="flex justify-between">
                 <span className="text-gray-600">Status:</span>
                 <span
                   className={`font-medium ${
                     item.status === "available"
                       ? "text-green-600"
-                      : item.status === "swapped"
+                      : item.status === "sold"
                       ? "text-red-600"
                       : "text-yellow-600"
                   }`}
@@ -210,67 +234,60 @@ const ItemDetail = () => {
             <div className="space-y-4 pt-6">
               {item.status === "available" && (
                 <>
+                  {item.availableFor?.purchase && (
+                    <button
+                      onClick={handlePurchase}
+                      className="w-full bg-black text-white py-3 px-8 text-sm font-medium hover:bg-gray-800 transition-colors"
+                    >
+                      BUY NOW - ₹{item.price}
+                    </button>
+                  )}
+
+                  {item.availableFor?.exchange && (
+                    <button
+                      onClick={handleExchangeRequest}
+                      className="w-full border border-black text-black py-3 px-8 text-sm font-medium hover:bg-black hover:text-white transition-colors"
+                    >
+                      REQUEST EXCHANGE
+                    </button>
+                  )}
+
                   <button
                     onClick={handleContactOwner}
-                    className="w-full bg-black text-white py-3 px-8 text-sm font-medium hover:bg-gray-800 transition-colors"
+                    className="w-full border border-gray-300 text-gray-700 py-3 px-8 text-sm font-medium hover:bg-gray-50 transition-colors"
                   >
                     CONTACT OWNER
                   </button>
-
-                  {item.acceptsSwap && (
-                    <button
-                      onClick={handleSwapRequest}
-                      className="w-full border border-black text-black py-3 px-8 text-sm font-medium hover:bg-black hover:text-white transition-colors"
-                    >
-                      REQUEST SWAP
-                    </button>
-                  )}
-
-                  {item.acceptsPoints && item.pointsValue && (
-                    <button
-                      onClick={handleRedeemWithPoints}
-                      className={`w-full py-3 px-8 text-sm font-medium transition-colors ${
-                        pointsBalance >= item.pointsValue
-                          ? "bg-green-600 text-white hover:bg-green-700"
-                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                      }`}
-                      disabled={pointsBalance < item.pointsValue}
-                    >
-                      REDEEM FOR {item.pointsValue} POINTS
-                      {pointsBalance < item.pointsValue &&
-                        " (Insufficient Points)"}
-                    </button>
-                  )}
                 </>
               )}
 
-              {item.status === "swapped" && (
+              {item.status === "sold" && (
                 <div className="text-center py-4 text-gray-500">
-                  This item has already been swapped
+                  This item has been sold
                 </div>
               )}
 
-              {item.status === "pending" && (
+              {item.status === "reserved" && (
                 <div className="text-center py-4 text-yellow-600">
-                  This item has a pending swap request
+                  This item is currently reserved
                 </div>
               )}
             </div>
 
             {/* Additional Info */}
             <div className="pt-6 border-t border-gray-200 space-y-4 text-sm text-gray-600">
-              <p>• All exchanges are facilitated through our secure platform</p>
-              <p>• Items are carefully verified for quality and authenticity</p>
+              <p>• Secure payments processed through Clerk</p>
+              <p>• All exchanges are facilitated through our platform</p>
+              <p>• Items are verified for quality and authenticity</p>
               <p>• Free local pickup and delivery in most areas</p>
-              <p>• 7-day return policy for exchanges</p>
             </div>
           </div>
         </div>
 
         {/* Contact Modal */}
         {showContactModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-8 max-w-md w-full mx-4">
+          <div className="fixed inset-0 backdrop-blur-sm bg-white bg-opacity-80 flex items-center justify-center z-50">
+            <div className="bg-white p-8 max-w-md w-full mx-4 shadow-2xl border border-gray-200">
               <h3 className="text-lg font-medium mb-4">
                 Contact {item.uploadedBy}
               </h3>
@@ -301,31 +318,83 @@ const ItemDetail = () => {
           </div>
         )}
 
-        {/* Swap Request Modal */}
-        {showSwapModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-8 max-w-md w-full mx-4">
+        {/* Exchange Request Modal */}
+        {showExchangeModal && (
+          <div className="fixed inset-0 backdrop-blur-sm bg-white bg-opacity-80 flex items-center justify-center z-50">
+            <div className="bg-white p-8 max-w-lg w-full mx-4 shadow-2xl border border-gray-200 max-h-[80vh] overflow-y-auto">
               <h3 className="text-lg font-medium mb-4">
-                Request Swap for {item.title}
+                Request Exchange for {item.title}
               </h3>
               <p className="text-gray-600 mb-6">
-                Propose an item swap with the owner. Describe what you're
-                offering in exchange.
+                Select one of your listed items to propose for exchange:
               </p>
-              <textarea
-                placeholder="Describe the item you want to swap..."
-                rows={4}
-                className="w-full border border-gray-300 p-3 text-sm focus:outline-none focus:border-gray-500"
-              />
-              <div className="flex space-x-3 mt-6">
+
+              {/* User's Items Selection */}
+              <div className="space-y-3 mb-6">
+                {uploadedItems.length === 0 ? (
+                  <div className="text-center py-8 bg-gray-50 rounded">
+                    <p className="text-gray-500">
+                      You haven't listed any items yet.
+                    </p>
+                    <Link
+                      to="/add-item"
+                      className="text-blue-600 hover:text-blue-800 text-sm"
+                    >
+                      List an item first →
+                    </Link>
+                  </div>
+                ) : (
+                  uploadedItems.map((userItem) => (
+                    <label
+                      key={userItem.id}
+                      className="flex items-center space-x-3 p-3 border rounded hover:bg-gray-50 cursor-pointer"
+                    >
+                      <input
+                        type="radio"
+                        name="exchangeItem"
+                        value={userItem.id}
+                        checked={selectedExchangeItem === userItem.id}
+                        onChange={(e) =>
+                          setSelectedExchangeItem(e.target.value)
+                        }
+                        className="text-black focus:ring-black"
+                      />
+                      <img
+                        src={userItem.image}
+                        alt={userItem.title}
+                        className="w-12 h-12 object-cover bg-gray-100"
+                      />
+                      <div className="flex-1">
+                        <div className="font-medium text-sm">
+                          {userItem.title}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {userItem.condition} • Size {userItem.size} • ₹
+                          {userItem.price}
+                        </div>
+                      </div>
+                    </label>
+                  ))
+                )}
+              </div>
+
+              <div className="flex space-x-3">
                 <button
-                  onClick={submitSwapRequest}
-                  className="flex-1 bg-black text-white py-2 px-4 text-sm font-medium hover:bg-gray-800 transition-colors"
+                  onClick={submitExchangeRequest}
+                  disabled={!selectedExchangeItem}
+                  className={`flex-1 py-2 px-4 text-sm font-medium transition-colors ${
+                    selectedExchangeItem
+                      ? "bg-black text-white hover:bg-gray-800"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  }`}
                 >
-                  SEND SWAP REQUEST
+                  SEND EXCHANGE REQUEST
                 </button>
                 <button
-                  onClick={() => setShowSwapModal(false)}
+                  onClick={() => {
+                    setShowExchangeModal(false);
+                    setSelectedExchangeItem("");
+                  }}
                   className="flex-1 border border-gray-300 text-gray-700 py-2 px-4 text-sm font-medium hover:bg-gray-50 transition-colors"
                 >
                   CANCEL

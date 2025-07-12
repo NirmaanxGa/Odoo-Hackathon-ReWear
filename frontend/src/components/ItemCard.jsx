@@ -13,12 +13,10 @@ const ItemCard = ({ item }) => {
     uploadedBy = "John Doe",
     price = 199,
     originalPrice = 399,
-    pointsValue = 75,
     status = "available",
-    exchangeOptions = {
-      acceptsCash: true,
-      acceptsExchange: true,
-      acceptsPoints: true,
+    availableFor = {
+      purchase: true,
+      exchange: true,
     },
   } = item || {};
 
@@ -31,8 +29,8 @@ const ItemCard = ({ item }) => {
             alt={title}
             className="w-full h-64 md:h-80 object-cover group-hover:scale-105 transition-transform duration-300"
           />
-          {/* Price and Points overlay */}
-          <div className="absolute top-2 left-2 space-y-1">
+          {/* Price overlay */}
+          <div className="absolute top-2 left-2">
             <div className="bg-white bg-opacity-90 px-2 py-1 text-xs font-medium">
               ₹{price}
               {originalPrice > price && (
@@ -41,22 +39,33 @@ const ItemCard = ({ item }) => {
                 </span>
               )}
             </div>
-            <div className="bg-blue-100 text-blue-800 px-2 py-1 text-xs font-medium">
-              {pointsValue} Points
-            </div>
+          </div>
+
+          {/* Available options */}
+          <div className="absolute top-2 right-2 space-y-1">
+            {availableFor.purchase && (
+              <div className="bg-green-100 text-green-800 px-2 py-1 text-xs font-medium rounded">
+                BUY
+              </div>
+            )}
+            {availableFor.exchange && (
+              <div className="bg-orange-100 text-orange-800 px-2 py-1 text-xs font-medium rounded">
+                EXCHANGE
+              </div>
+            )}
           </div>
 
           {/* Status indicator */}
           {status !== "available" && (
-            <div className="absolute top-2 right-2">
+            <div className="absolute bottom-2 left-2">
               <span
-                className={`px-2 py-1 text-xs font-medium rounded-full ${
-                  status === "pending_swap"
+                className={`px-2 py-1 text-xs font-medium rounded ${
+                  status === "reserved"
                     ? "bg-yellow-100 text-yellow-800"
-                    : "bg-gray-100 text-gray-800"
+                    : "bg-red-100 text-red-800"
                 }`}
               >
-                {status === "pending_swap" ? "Pending" : "Swapped"}
+                {status === "reserved" ? "Reserved" : "Sold"}
               </span>
             </div>
           )}
@@ -71,25 +80,6 @@ const ItemCard = ({ item }) => {
           </p>
           <p className="text-xs text-gray-400">{location}</p>
           <p className="text-xs text-gray-400">by {uploadedBy}</p>
-
-          {/* Exchange options */}
-          <div className="flex gap-1 mt-2">
-            {exchangeOptions.acceptsCash && (
-              <span className="text-xs bg-green-50 text-green-700 px-1 py-0.5 rounded">
-                Cash
-              </span>
-            )}
-            {exchangeOptions.acceptsExchange && (
-              <span className="text-xs bg-blue-50 text-blue-700 px-1 py-0.5 rounded">
-                Swap
-              </span>
-            )}
-            {exchangeOptions.acceptsPoints && (
-              <span className="text-xs bg-purple-50 text-purple-700 px-1 py-0.5 rounded">
-                Points
-              </span>
-            )}
-          </div>
         </div>
       </Link>
     </div>

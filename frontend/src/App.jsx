@@ -21,6 +21,7 @@ import Dashboard from "./pages/Dashboard";
 import AdminPanel from "./pages/AdminPanel";
 import Cart from "./pages/Cart";
 import History from "./pages/History";
+import Rewards from "./pages/Rewards";
 
 const App = () => {
   return (
@@ -37,6 +38,7 @@ const App = () => {
             <Route path="/cart" element={<Cart />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/history" element={<History />} />
+            <Route path="/rewards" element={<Rewards />} />
             <Route path="/admin" element={<AdminPanel />} />
 
             {/* Protected Routes */}

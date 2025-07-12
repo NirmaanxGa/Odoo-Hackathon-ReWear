@@ -1,6 +1,6 @@
 import { assets, products } from "./frontend_assets/assets.js";
 
-// Transform products data for ReWear (adding Indian pricing, points system, and swap features)
+// Transform products data for ReWear (clean exchange platform)
 export const reWearItems = products.slice(0, 20).map((product, index) => ({
   id: product._id,
   title: product.name,
@@ -12,11 +12,9 @@ export const reWearItems = products.slice(0, 20).map((product, index) => ({
   category: product.subCategory,
   type: ["Casual", "Formal", "Party", "Everyday"][index % 4],
   condition: ["Like New", "Excellent", "Very Good", "Good"][index % 4],
-  // Indian pricing in INR
+  // Indian pricing in INR for direct purchase
   price: [149, 299, 399, 199, 249, 349, 179, 229, 319, 159][index % 10],
   originalPrice: [299, 599, 799, 399, 499, 699, 359, 459, 639, 319][index % 10],
-  // Points system for ReWear
-  pointsValue: [50, 100, 150, 75, 90, 120, 60, 80, 110, 55][index % 10],
   location: [
     "Mumbai, Maharashtra",
     "Delhi, NCR",
@@ -39,30 +37,66 @@ export const reWearItems = products.slice(0, 20).map((product, index) => ({
   ][index % 8],
   uploadedAt: new Date(product.date).toISOString(),
   bestseller: product.bestseller,
-  tags: [
-    "sustainable",
-    "fashion",
-    "exchange",
-    "preloved",
-    "cotton",
-    "denim",
-    "formal",
-    "casual",
-  ],
-  // User can set their own pricing
-  isUserPriced: Math.random() > 0.5, // Some items have user-set prices
-  status: ["available", "pending_swap", "swapped"][
-    Math.floor(Math.random() * 3)
-  ],
-  swapRequests: Math.floor(Math.random() * 5), // Number of swap requests
-  exchangeOptions: {
-    acceptsCash: true,
-    acceptsExchange: true,
-    acceptsPoints: true,
-    preferredCategories: ["Topwear", "Bottomwear", "Winterwear"],
-    minExchangeValue: [100, 150, 200, 250][index % 4],
+  // Each purchase earns user 200 points
+  pointsEarned: 200, // Fixed points per purchase
+  // Clean status system
+  status: ["available", "reserved", "sold"][Math.floor(Math.random() * 3)],
+  swapRequests: Math.floor(Math.random() * 3), // Number of exchange requests
+  // Item can be purchased or exchanged
+  availableFor: {
+    purchase: true, // Can be bought with money via Clerk
+    exchange: true, // Can be exchanged for another item
   },
 }));
+
+// FOREVER Special Rewards - Redeemable with points
+export const rewardsItems = [
+  {
+    id: "reward_1",
+    title: "FOREVER Cap",
+    description: "Premium quality cap with FOREVER branding",
+    image: assets.logo, // Using logo as placeholder
+    pointsRequired: 600,
+    category: "Accessories",
+    inStock: true,
+  },
+  {
+    id: "reward_2",
+    title: "FOREVER T-Shirt",
+    description: "Exclusive FOREVER branded cotton t-shirt",
+    image: assets.logo,
+    pointsRequired: 1000,
+    category: "Clothing",
+    inStock: true,
+  },
+  {
+    id: "reward_3",
+    title: "FOREVER Tote Bag",
+    description: "Sustainable canvas tote bag with FOREVER logo",
+    image: assets.logo,
+    pointsRequired: 800,
+    category: "Accessories",
+    inStock: true,
+  },
+  {
+    id: "reward_4",
+    title: "FOREVER Water Bottle",
+    description: "Eco-friendly steel water bottle",
+    image: assets.logo,
+    pointsRequired: 1200,
+    category: "Lifestyle",
+    inStock: true,
+  },
+  {
+    id: "reward_5",
+    title: "FOREVER Premium Hoodie",
+    description: "Limited edition premium hoodie",
+    image: assets.logo,
+    pointsRequired: 2000,
+    category: "Clothing",
+    inStock: true,
+  },
+];
 
 // Featured items for homepage
 export const featuredItems = reWearItems.slice(0, 8);

@@ -2,13 +2,17 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useUserContext } from "../context/UserContext";
 import { useAuth, useUser } from "@clerk/clerk-react";
-import ItemCard from "../components/ItemCard";
 
 const Dashboard = () => {
   const { isSignedIn } = useAuth();
   const { user } = useUser();
-  const { uploadedItems, swapHistory, pointsBalance, ongoingSwaps } =
-    useUserContext();
+  const {
+    uploadedItems,
+    purchaseHistory,
+    exchangeHistory,
+    pointsBalance,
+    rewardsRedeemed,
+  } = useUserContext();
   const [activeTab, setActiveTab] = useState("overview");
 
   // If not signed in, show login prompt
@@ -33,61 +37,10 @@ const Dashboard = () => {
 
   const stats = {
     totalUploads: uploadedItems.length,
-    totalSwaps: swapHistory.length,
+    totalPurchases: purchaseHistory.length,
+    totalExchanges: exchangeHistory.length,
     pointsBalance: pointsBalance,
-    ongoingSwaps: ongoingSwaps.length,
   };
-
-  // Dummy uploaded items
-  const myItems = [
-    {
-      id: 101,
-      title: "My Blue Denim Jacket",
-      image: "https://via.placeholder.com/300x400?text=My+Jacket",
-      size: "M",
-      category: "Jackets",
-      condition: "Good",
-      location: "Current Location",
-      uploadedBy: "You",
-      status: "active",
-    },
-    {
-      id: 102,
-      title: "My Summer Dress",
-      image: "https://via.placeholder.com/300x400?text=My+Dress",
-      size: "S",
-      category: "Dresses",
-      condition: "Excellent",
-      location: "Current Location",
-      uploadedBy: "You",
-      status: "pending",
-    },
-  ];
-
-  // Dummy activity history
-  const recentActivity = [
-    {
-      id: 1,
-      type: "contact",
-      item: { title: "Vintage Sneakers" },
-      date: "2025-01-08",
-      status: "completed",
-    },
-    {
-      id: 2,
-      type: "exchange-request",
-      item: { title: "Designer Handbag" },
-      date: "2025-01-05",
-      status: "pending",
-    },
-    {
-      id: 3,
-      type: "upload",
-      item: { title: "Cotton T-Shirt" },
-      date: "2025-01-03",
-      status: "approved",
-    },
-  ];
 
   return (
     <div className="min-h-screen bg-white">
@@ -110,263 +63,168 @@ const Dashboard = () => {
           </div>
           <div className="bg-gray-50 p-6 text-center">
             <div className="text-2xl font-light text-gray-900 mb-1">
-              {stats.totalSwaps}
+              {stats.totalPurchases}
             </div>
-            <div className="text-sm text-gray-600">Swaps Completed</div>
+            <div className="text-sm text-gray-600">Purchases Made</div>
           </div>
           <div className="bg-gray-50 p-6 text-center">
             <div className="text-2xl font-light text-gray-900 mb-1">
-              {stats.pointsBalance}
+              {stats.totalExchanges}
             </div>
-            <div className="text-sm text-gray-600">Points Balance</div>
+            <div className="text-sm text-gray-600">Exchanges</div>
           </div>
-          <div className="bg-gray-50 p-6 text-center">
-            <div className="text-2xl font-light text-gray-900 mb-1">
-              {stats.ongoingSwaps}
-            </div>
-            <div className="text-sm text-gray-600">Ongoing Swaps</div>
-          </div>
-        </div>
-
-        {/* Tabs */}
-        <div className="mb-8">
-          <nav className="flex space-x-8 border-b border-gray-200">
-            {[
-              { id: "overview", label: "Overview" },
-              { id: "items", label: "My Items" },
-              { id: "activity", label: "Activity" },
-              { id: "profile", label: "Profile" },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  activeTab === tab.id
-                    ? "border-black text-black"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </nav>
-        </div>
-
-        {/* Tab Content */}
-        <div>
-          {activeTab === "overview" && (
-            <div>
-              <h2 className="text-xl font-light mb-6">Recent Activity</h2>
-              <div className="space-y-4">
-                {recentActivity.slice(0, 5).map((activity) => (
-                  <div
-                    key={activity.id}
-                    className="flex items-center justify-between p-4 border border-gray-200"
-                  >
-                    <div className="flex items-center">
-                      <div
-                        className={`w-2 h-2 rounded-full mr-4 ${
-                          activity.status === "completed"
-                            ? "bg-green-500"
-                            : activity.status === "pending"
-                            ? "bg-yellow-500"
-                            : "bg-blue-500"
-                        }`}
-                      ></div>
-                      <div>
-                        <p className="font-medium text-sm">
-                          {activity.type === "contact"
-                            ? "Contacted about"
-                            : activity.type === "exchange-request"
-                            ? "Exchange requested for"
-                            : "Uploaded"}{" "}
-                          {activity.item.title}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {new Date(activity.date).toLocaleDateString()}
-                        </p>
-                      </div>
-                    </div>
-                    <span
-                      className={`text-xs px-2 py-1 rounded ${
-                        activity.status === "completed"
-                          ? "bg-green-100 text-green-800"
-                          : activity.status === "pending"
-                          ? "bg-yellow-100 text-yellow-800"
-                          : "bg-blue-100 text-blue-800"
-                      }`}
-                    >
-                      {activity.status}
-                    </span>
-                  </div>
-                ))}
+          <div className="bg-gray-50 p-6 text-center cursor-pointer hover:bg-gray-100 transition-colors">
+            <Link to="/rewards" className="block">
+              <div className="text-2xl font-light text-green-600 mb-1">
+                {stats.pointsBalance}
               </div>
-            </div>
-          )}
+              <div className="text-sm text-gray-600">Points Available</div>
+              <div className="text-xs text-green-600 mt-1">
+                Click to redeem →
+              </div>
+            </Link>
+          </div>
+        </div>
 
-          {activeTab === "items" && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-light">My Items</h2>
-                <Link
-                  to="/add-item"
-                  className="bg-black text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors"
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Link
+            to="/add-item"
+            className={`border p-6 text-center hover:bg-gray-50 transition-colors ${
+              stats.totalUploads === 0
+                ? "border-blue-300 bg-blue-50"
+                : "border-gray-200"
+            }`}
+          >
+            <div
+              className={`text-lg font-medium mb-2 ${
+                stats.totalUploads === 0 ? "text-blue-700" : "text-gray-900"
+              }`}
+            >
+              List New Item
+            </div>
+            <div
+              className={`text-sm ${
+                stats.totalUploads === 0 ? "text-blue-600" : "text-gray-600"
+              }`}
+            >
+              {stats.totalUploads === 0
+                ? "Required to request exchanges from others"
+                : "Upload items for sale or exchange"}
+            </div>
+          </Link>
+
+          <Link
+            to="/browse"
+            className="border border-gray-200 p-6 text-center hover:bg-gray-50 transition-colors"
+          >
+            <div className="text-lg font-medium text-gray-900 mb-2">
+              Browse Items
+            </div>
+            <div className="text-sm text-gray-600">
+              Find items to buy or exchange
+            </div>
+          </Link>
+
+          <Link
+            to="/rewards"
+            className="border border-gray-200 p-6 text-center hover:bg-gray-50 transition-colors bg-green-50"
+          >
+            <div className="text-lg font-medium text-green-700 mb-2">
+              Redeem Rewards
+            </div>
+            <div className="text-sm text-green-600">
+              Use {pointsBalance} points for FOREVER items
+            </div>
+          </Link>
+        </div>
+
+        {/* Exchange Requirements Info */}
+        {stats.totalUploads === 0 && (
+          <div className="mb-8 bg-blue-50 border border-blue-200 p-6 rounded">
+            <h3 className="text-lg font-medium text-blue-900 mb-2">
+              💡 Want to Request Exchanges?
+            </h3>
+            <p className="text-blue-700 mb-3">
+              To request exchanges from other users, you need to have at least
+              one item listed on the platform.
+            </p>
+            <div className="text-sm text-blue-600 space-y-1">
+              <p>• List your items to unlock exchange requests</p>
+              <p>• Choose from your listed items when proposing exchanges</p>
+              <p>• Build trust in the community by contributing items</p>
+            </div>
+          </div>
+        )}
+
+        {/* Recent Activity */}
+        <div className="space-y-6">
+          <h2 className="text-xl font-medium text-gray-900">Recent Activity</h2>
+
+          {purchaseHistory.length === 0 && exchangeHistory.length === 0 ? (
+            <div className="text-center py-12 bg-gray-50">
+              <p className="text-gray-500">No activity yet</p>
+              <p className="text-sm text-gray-400 mt-2">
+                Start by browsing items or listing your own!
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {/* Purchase History */}
+              {purchaseHistory.map((purchase, index) => (
+                <div
+                  key={`purchase-${index}`}
+                  className="border border-gray-200 p-4"
                 >
-                  ADD NEW ITEM
-                </Link>
-              </div>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-medium text-gray-900">
+                        {purchase.title}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Purchased for ₹{purchase.price}
+                      </p>
+                      <p className="text-sm text-green-600">
+                        +{purchase.pointsEarned} points earned
+                      </p>
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {new Date(purchase.purchaseDate).toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+              ))}
 
-              {myItems.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {myItems.map((item) => (
-                    <div key={item.id} className="relative">
-                      <ItemCard item={item} />
-                      <div
-                        className={`absolute top-2 left-2 px-2 py-1 rounded text-xs font-medium ${
-                          item.status === "active"
-                            ? "bg-green-100 text-green-800"
-                            : item.status === "pending"
-                            ? "bg-yellow-100 text-yellow-800"
-                            : "bg-gray-100 text-gray-800"
+              {/* Exchange History */}
+              {exchangeHistory.map((exchange, index) => (
+                <div
+                  key={`exchange-${index}`}
+                  className="border border-gray-200 p-4"
+                >
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-medium text-gray-900">
+                        {exchange.item?.title}
+                      </h3>
+                      <p className="text-sm text-gray-600">
+                        Exchange {exchange.type}
+                      </p>
+                      <p
+                        className={`text-sm ${
+                          exchange.status === "pending"
+                            ? "text-yellow-600"
+                            : "text-green-600"
                         }`}
                       >
-                        {item.status}
-                      </div>
+                        Status: {exchange.status}
+                      </p>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-16">
-                  <p className="text-gray-500 mb-4">No items uploaded yet</p>
-                  <Link
-                    to="/add-item"
-                    className="bg-black text-white px-6 py-3 text-sm font-medium hover:bg-gray-800 transition-colors"
-                  >
-                    UPLOAD YOUR FIRST ITEM
-                  </Link>
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeTab === "activity" && (
-            <div>
-              <h2 className="text-xl font-light mb-6">Activity History</h2>
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 text-sm font-medium text-gray-700">
-                        Date
-                      </th>
-                      <th className="text-left py-3 text-sm font-medium text-gray-700">
-                        Type
-                      </th>
-                      <th className="text-left py-3 text-sm font-medium text-gray-700">
-                        Item
-                      </th>
-                      <th className="text-left py-3 text-sm font-medium text-gray-700">
-                        Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {recentActivity.map((activity) => (
-                      <tr key={activity.id}>
-                        <td className="py-3 text-sm text-gray-900">
-                          {new Date(activity.date).toLocaleDateString()}
-                        </td>
-                        <td className="py-3 text-sm text-gray-900 capitalize">
-                          {activity.type.replace("-", " ")}
-                        </td>
-                        <td className="py-3 text-sm text-gray-900">
-                          {activity.item.title}
-                        </td>
-                        <td className="py-3">
-                          <span
-                            className={`text-xs px-2 py-1 rounded ${
-                              activity.status === "completed"
-                                ? "bg-green-100 text-green-800"
-                                : activity.status === "pending"
-                                ? "bg-yellow-100 text-yellow-800"
-                                : "bg-blue-100 text-blue-800"
-                            }`}
-                          >
-                            {activity.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {activeTab === "profile" && (
-            <div>
-              <h2 className="text-xl font-light mb-6">Profile Settings</h2>
-              <div className="max-w-2xl space-y-6">
-                <div className="flex items-center mb-6">
-                  <img
-                    src={
-                      user?.imageUrl ||
-                      "https://via.placeholder.com/100x100?text=Avatar"
-                    }
-                    alt="Profile"
-                    className="w-20 h-20 rounded-full mr-4"
-                  />
-                  <div>
-                    <h3 className="font-medium">
-                      {user?.fullName || "User Name"}
-                    </h3>
-                    <p className="text-gray-600 text-sm">
-                      {user?.primaryEmailAddress?.emailAddress}
-                    </p>
+                    <div className="text-sm text-gray-500">
+                      {new Date(exchange.date).toLocaleDateString()}
+                    </div>
                   </div>
                 </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Location
-                  </label>
-                  <input
-                    type="text"
-                    defaultValue="New York, NY"
-                    className="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-gray-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Bio
-                  </label>
-                  <textarea
-                    rows={3}
-                    defaultValue="Fashion enthusiast who loves sustainable clothing exchanges."
-                    className="w-full border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-gray-500"
-                  />
-                </div>
-
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="notifications"
-                    defaultChecked
-                    className="mr-3"
-                  />
-                  <label
-                    htmlFor="notifications"
-                    className="text-sm text-gray-700"
-                  >
-                    Receive email notifications
-                  </label>
-                </div>
-
-                <button className="bg-black text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors">
-                  SAVE CHANGES
-                </button>
-              </div>
+              ))}
             </div>
           )}
         </div>

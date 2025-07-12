@@ -8,7 +8,7 @@ const Carousel = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % carouselImages.length);
-    }, 2000); // Slower 6-second intervals for better viewing
+    }, 3000); // Slower 3-second intervals for better viewing
 
     return () => clearInterval(timer);
   }, []);

@@ -1,41 +1,57 @@
-import React, { useState } from 'react';
-import { useUserContext } from '../context/UserContext';
-import { toast } from 'react-toastify';
-import { assets } from '../assets/data';
+import React, { useState } from "react";
+import { useUserContext } from "../context/UserContext";
+import { toast } from "react-toastify";
+import { assets } from "../assets/data";
 
 const AddItem = () => {
   const { addUploadedItem } = useUserContext();
   const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    category: '',
-    size: '',
-    condition: '',
-    brand: '',
-    color: '',
-    material: '',
-    location: '',
-    images: []
+    title: "",
+    description: "",
+    category: "",
+    size: "",
+    condition: "",
+    brand: "",
+    color: "",
+    material: "",
+    location: "",
+    images: [],
+    // Pricing options
+    price: "",
+    originalPrice: "",
+    acceptsCash: true,
+    acceptsExchange: true,
+    minExchangeValue: "",
+    preferredCategories: [],
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const categories = ['Topwear', 'Bottomwear', 'Winterwear'];
-  const sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
-  const conditions = ['Like New', 'Excellent', 'Very Good', 'Good', 'Fair'];
+  const categories = ["Topwear", "Bottomwear", "Winterwear"];
+  const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
+  const conditions = ["Like New", "Excellent", "Very Good", "Good", "Fair"];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
+    }));
+  };
+
+  const handleCategoryPreference = (category) => {
+    setFormData((prev) => ({
+      ...prev,
+      preferredCategories: prev.preferredCategories.includes(category)
+        ? prev.preferredCategories.filter((c) => c !== category)
+        : [...prev.preferredCategories, category],
     }));
   };
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      images: files
+      images: files,
     }));
   };
 
@@ -45,38 +61,45 @@ const AddItem = () => {
 
     try {
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Create new item
       const newItem = {
         id: Date.now().toString(),
         ...formData,
-        uploadedBy: 'Current User',
+        uploadedBy: "Current User",
         uploadedAt: new Date().toISOString(),
-        status: 'pending'
+        status: "pending",
       };
 
       // Add to user's uploaded items
       addUploadedItem(newItem);
-      
-      toast.success('Item uploaded successfully! It will be reviewed by our team.');
-      
+
+      toast.success(
+        "Item uploaded successfully! It will be reviewed by our team."
+      );
+
       // Reset form
       setFormData({
-        title: '',
-        description: '',
-        category: '',
-        size: '',
-        condition: '',
-        brand: '',
-        color: '',
-        material: '',
-        location: '',
-        images: []
+        title: "",
+        description: "",
+        category: "",
+        size: "",
+        condition: "",
+        brand: "",
+        color: "",
+        material: "",
+        location: "",
+        images: [],
+        price: "",
+        originalPrice: "",
+        acceptsCash: true,
+        acceptsExchange: true,
+        minExchangeValue: "",
+        preferredCategories: [],
       });
-
     } catch (error) {
-      toast.error('Failed to upload item. Please try again.');
+      toast.error("Failed to upload item. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -85,15 +108,15 @@ const AddItem = () => {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-3xl font-light text-gray-900 mb-4">SHARE YOUR ITEM</h1>
+          <h1 className="text-3xl font-light text-gray-900 mb-4">
+            SHARE YOUR ITEM
+          </h1>
           <div className="w-24 h-px bg-gray-300 mx-auto"></div>
         </div>
-        
+
         <form onSubmit={handleSubmit} className="space-y-8">
-          
           {/* Image Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-900 mb-4">
@@ -110,10 +133,12 @@ const AddItem = () => {
                 className="hidden"
               />
               <label htmlFor="images" className="cursor-pointer">
-                <img src={assets.upload_area} alt="Upload" className="w-16 h-16 mx-auto mb-4 opacity-60" />
-                <p className="text-gray-600 mb-2">
-                  Click to upload images
-                </p>
+                <img
+                  src={assets.upload_area}
+                  alt="Upload"
+                  className="w-16 h-16 mx-auto mb-4 opacity-60"
+                />
+                <p className="text-gray-600 mb-2">Click to upload images</p>
                 <p className="text-sm text-gray-500">
                   PNG, JPG, GIF up to 10MB each
                 </p>
@@ -128,7 +153,10 @@ const AddItem = () => {
 
           {/* Title */}
           <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-900 mb-2">
+            <label
+              htmlFor="title"
+              className="block text-sm font-medium text-gray-900 mb-2"
+            >
               Item Name*
             </label>
             <input
@@ -145,7 +173,10 @@ const AddItem = () => {
 
           {/* Description */}
           <div>
-            <label htmlFor="description" className="block text-sm font-medium text-gray-900 mb-2">
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-900 mb-2"
+            >
               Description*
             </label>
             <textarea
@@ -163,7 +194,10 @@ const AddItem = () => {
           {/* Category and Size */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-gray-900 mb-2">
+              <label
+                htmlFor="category"
+                className="block text-sm font-medium text-gray-900 mb-2"
+              >
                 Category*
               </label>
               <select
@@ -175,14 +209,19 @@ const AddItem = () => {
                 className="w-full border border-gray-300 px-3 py-3 text-sm focus:outline-none focus:border-gray-500"
               >
                 <option value="">Select Category</option>
-                {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label htmlFor="size" className="block text-sm font-medium text-gray-900 mb-2">
+              <label
+                htmlFor="size"
+                className="block text-sm font-medium text-gray-900 mb-2"
+              >
                 Size*
               </label>
               <select
@@ -194,8 +233,10 @@ const AddItem = () => {
                 className="w-full border border-gray-300 px-3 py-3 text-sm focus:outline-none focus:border-gray-500"
               >
                 <option value="">Select Size</option>
-                {sizes.map(size => (
-                  <option key={size} value={size}>{size}</option>
+                {sizes.map((size) => (
+                  <option key={size} value={size}>
+                    {size}
+                  </option>
                 ))}
               </select>
             </div>
@@ -204,7 +245,10 @@ const AddItem = () => {
           {/* Condition and Brand */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="condition" className="block text-sm font-medium text-gray-900 mb-2">
+              <label
+                htmlFor="condition"
+                className="block text-sm font-medium text-gray-900 mb-2"
+              >
                 Condition*
               </label>
               <select
@@ -216,14 +260,19 @@ const AddItem = () => {
                 className="w-full border border-gray-300 px-3 py-3 text-sm focus:outline-none focus:border-gray-500"
               >
                 <option value="">Select Condition</option>
-                {conditions.map(condition => (
-                  <option key={condition} value={condition}>{condition}</option>
+                {conditions.map((condition) => (
+                  <option key={condition} value={condition}>
+                    {condition}
+                  </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label htmlFor="brand" className="block text-sm font-medium text-gray-900 mb-2">
+              <label
+                htmlFor="brand"
+                className="block text-sm font-medium text-gray-900 mb-2"
+              >
                 Brand
               </label>
               <input
@@ -241,7 +290,10 @@ const AddItem = () => {
           {/* Color and Material */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label htmlFor="color" className="block text-sm font-medium text-gray-900 mb-2">
+              <label
+                htmlFor="color"
+                className="block text-sm font-medium text-gray-900 mb-2"
+              >
                 Color
               </label>
               <input
@@ -256,7 +308,10 @@ const AddItem = () => {
             </div>
 
             <div>
-              <label htmlFor="material" className="block text-sm font-medium text-gray-900 mb-2">
+              <label
+                htmlFor="material"
+                className="block text-sm font-medium text-gray-900 mb-2"
+              >
                 Material
               </label>
               <input
@@ -273,7 +328,10 @@ const AddItem = () => {
 
           {/* Location */}
           <div>
-            <label htmlFor="location" className="block text-sm font-medium text-gray-900 mb-2">
+            <label
+              htmlFor="location"
+              className="block text-sm font-medium text-gray-900 mb-2"
+            >
               Location*
             </label>
             <input
@@ -288,6 +346,121 @@ const AddItem = () => {
             />
           </div>
 
+          {/* Pricing Section */}
+          <div className="border-t border-gray-200 pt-8">
+            <h3 className="text-lg font-medium text-gray-900 mb-6">
+              Pricing & Exchange Options
+            </h3>
+
+            {/* Price */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div>
+                <label
+                  htmlFor="price"
+                  className="block text-sm font-medium text-gray-900 mb-2"
+                >
+                  Selling Price (₹)*
+                </label>
+                <input
+                  type="number"
+                  id="price"
+                  name="price"
+                  required
+                  min="1"
+                  value={formData.price}
+                  onChange={handleInputChange}
+                  placeholder="Enter selling price"
+                  className="w-full border border-gray-300 px-3 py-3 text-sm focus:outline-none focus:border-gray-500"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="originalPrice"
+                  className="block text-sm font-medium text-gray-900 mb-2"
+                >
+                  Original Price (₹)
+                </label>
+                <input
+                  type="number"
+                  id="originalPrice"
+                  name="originalPrice"
+                  min="1"
+                  value={formData.originalPrice}
+                  onChange={handleInputChange}
+                  placeholder="Enter original price"
+                  className="w-full border border-gray-300 px-3 py-3 text-sm focus:outline-none focus:border-gray-500"
+                />
+              </div>
+            </div>
+
+            {/* Exchange Options */}
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-gray-900 mb-4">
+                Payment Methods You Accept
+              </label>
+              <div className="space-y-3">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="acceptsCash"
+                    checked={formData.acceptsCash}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        acceptsCash: e.target.checked,
+                      }))
+                    }
+                    className="mr-3"
+                  />
+                  <span className="text-sm text-gray-700">
+                    Accept Cash Payment
+                  </span>
+                </label>
+
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    name="acceptsExchange"
+                    checked={formData.acceptsExchange}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        acceptsExchange: e.target.checked,
+                      }))
+                    }
+                    className="mr-3"
+                  />
+                  <span className="text-sm text-gray-700">
+                    Accept Item Exchange
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            {/* Minimum Exchange Value */}
+            {formData.acceptsExchange && (
+              <div>
+                <label
+                  htmlFor="minExchangeValue"
+                  className="block text-sm font-medium text-gray-900 mb-2"
+                >
+                  Minimum Exchange Value (₹)
+                </label>
+                <input
+                  type="number"
+                  id="minExchangeValue"
+                  name="minExchangeValue"
+                  min="1"
+                  value={formData.minExchangeValue}
+                  onChange={handleInputChange}
+                  placeholder="Minimum value for exchange items"
+                  className="w-full border border-gray-300 px-3 py-3 text-sm focus:outline-none focus:border-gray-500"
+                />
+              </div>
+            )}
+          </div>
+
           {/* Submit Button */}
           <div className="text-center pt-8">
             <button
@@ -295,7 +468,7 @@ const AddItem = () => {
               disabled={isSubmitting}
               className="bg-black text-white px-12 py-3 text-sm font-medium hover:bg-gray-800 disabled:bg-gray-400 transition-colors"
             >
-              {isSubmitting ? 'UPLOADING...' : 'ADD ITEM'}
+              {isSubmitting ? "UPLOADING..." : "ADD ITEM"}
             </button>
           </div>
         </form>

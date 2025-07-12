@@ -10,6 +10,7 @@ import { UserProvider } from "./context/UserContext";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ScrollToTop from "./components/ScrollToTop";
 
 // Pages
 import Home from "./pages/Home";
@@ -18,11 +19,14 @@ import AddItem from "./pages/AddItem";
 import ItemDetail from "./pages/ItemDetail";
 import Dashboard from "./pages/Dashboard";
 import AdminPanel from "./pages/AdminPanel";
+import Cart from "./pages/Cart";
+import History from "./pages/History";
 
 const App = () => {
   return (
     <UserProvider>
       <div className="min-h-screen flex flex-col">
+        <ScrollToTop />
         <Navbar />
 
         <main className="flex-1">
@@ -30,6 +34,10 @@ const App = () => {
             <Route path="/" element={<Home />} />
             <Route path="/browse" element={<Browse />} />
             <Route path="/item/:id" element={<ItemDetail />} />
+            <Route path="/cart" element={<Cart />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/history" element={<History />} />
+            <Route path="/admin" element={<AdminPanel />} />
 
             {/* Protected Routes */}
             <Route
@@ -37,22 +45,6 @@ const App = () => {
               element={
                 <ProtectedRoute>
                   <AddItem />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <Dashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin"
-              element={
-                <ProtectedRoute requireAdmin={true}>
-                  <AdminPanel />
                 </ProtectedRoute>
               }
             />

@@ -1,10 +1,141 @@
-import React, { useState } from 'react';
-import { useUserContext } from '../context/UserContext';
-import { toast } from 'react-toastify';
+import React, { useState } from "react";
+import { useAuth } from "@clerk/clerk-react";
+import { useUserContext } from "../context/UserContext";
+import { toast } from "react-toastify";
+import { ADMIN_CONFIG, validateAdminCredentials } from "../config/adminConfig";
 
 const AdminPanel = () => {
+  const { isSignedIn } = useAuth();
   const { setUserRole } = useUserContext();
-  const [activeTab, setActiveTab] = useState('pending');
+  const [activeTab, setActiveTab] = useState("pending");
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [showAdminLogin, setShowAdminLogin] = useState(false);
+  const [adminCredentials, setAdminCredentials] = useState({
+    username: "",
+    password: "",
+  });
+
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+
+    if (
+      validateAdminCredentials(
+        adminCredentials.username,
+        adminCredentials.password
+      )
+    ) {
+      setIsAdminLoggedIn(true);
+      setShowAdminLogin(false);
+      toast.success("Admin login successful!");
+      setAdminCredentials({ username: "", password: "" });
+    } else {
+      toast.error("Invalid admin credentials!");
+    }
+  };
+
+  const handleAdminLogout = () => {
+    setIsAdminLoggedIn(false);
+    toast.info("Admin logged out");
+  };
+
+  // If not admin logged in, show admin login
+  if (!isAdminLoggedIn) {
+    return (
+      <div className="min-h-screen bg-white">
+        <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-light text-gray-900 mb-4">
+              Admin Panel
+            </h1>
+            <p className="text-gray-600 mb-8">
+              Enter admin credentials to access the panel
+            </p>
+          </div>
+
+          {/* Admin Login Form */}
+          <div className="border border-gray-200 p-8">
+            <form onSubmit={handleAdminLogin} className="space-y-6">
+              <div>
+                <label
+                  htmlFor="username"
+                  className="block text-sm font-medium text-gray-900 mb-2"
+                >
+                  Admin Username
+                </label>
+                <input
+                  type="text"
+                  id="username"
+                  required
+                  value={adminCredentials.username}
+                  onChange={(e) =>
+                    setAdminCredentials((prev) => ({
+                      ...prev,
+                      username: e.target.value,
+                    }))
+                  }
+                  placeholder="Enter admin username"
+                  className="w-full border border-gray-300 px-3 py-3 text-sm focus:outline-none focus:border-gray-500"
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-gray-900 mb-2"
+                >
+                  Admin Password
+                </label>
+                <input
+                  type="password"
+                  id="password"
+                  required
+                  value={adminCredentials.password}
+                  onChange={(e) =>
+                    setAdminCredentials((prev) => ({
+                      ...prev,
+                      password: e.target.value,
+                    }))
+                  }
+                  placeholder="Enter admin password"
+                  className="w-full border border-gray-300 px-3 py-3 text-sm focus:outline-none focus:border-gray-500"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full bg-black text-white py-3 text-sm font-medium hover:bg-gray-800 transition-colors"
+              >
+                LOGIN AS ADMIN
+              </button>
+            </form>
+
+            {/* Demo Credentials Display */}
+            <div className="mt-6 p-4 bg-gray-50 border border-gray-200">
+              <p className="text-xs text-gray-600 mb-2">Demo Credentials:</p>
+              <p className="text-xs text-gray-800">
+                Username:{" "}
+                <span className="font-mono">
+                  {ADMIN_CONFIG.credentials.username}
+                </span>
+              </p>
+              <p className="text-xs text-gray-800">
+                Password:{" "}
+                <span className="font-mono">
+                  {ADMIN_CONFIG.credentials.password}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <div className="text-center mt-8">
+            <a href="/" className="text-sm text-gray-600 hover:text-gray-900">
+              ← Back to Home
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Dummy pending items for approval
   const [pendingItems, setPendingItems] = useState([
@@ -20,7 +151,7 @@ const AdminPanel = () => {
       location: "Boston, MA",
       uploadedBy: "John D.",
       uploadedAt: "2025-01-10T10:30:00Z",
-      status: "pending"
+      status: "pending",
     },
     {
       id: 202,
@@ -34,8 +165,8 @@ const AdminPanel = () => {
       location: "New York, NY",
       uploadedBy: "Emma K.",
       uploadedAt: "2025-01-10T14:15:00Z",
-      status: "pending"
-    }
+      status: "pending",
+    },
   ]);
 
   // Dummy users for role management
@@ -46,7 +177,7 @@ const AdminPanel = () => {
       email: "john@example.com",
       role: "user",
       joinedAt: "2024-12-15",
-      itemsUploaded: 12
+      itemsUploaded: 12,
     },
     {
       id: 2,
@@ -54,46 +185,41 @@ const AdminPanel = () => {
       email: "emma@example.com",
       role: "user",
       joinedAt: "2024-11-20",
-      itemsUploaded: 8
-    }
+      itemsUploaded: 8,
+    },
   ]);
 
   // Stats
   const stats = {
     totalUsers: users.length + 150,
     totalItems: 45,
-    pendingApprovals: pendingItems.filter(item => item.status === 'pending').length,
-    totalExchanges: 89
+    pendingApprovals: pendingItems.filter((item) => item.status === "pending")
+      .length,
+    totalExchanges: 89,
   };
 
   const handleApproveItem = (itemId) => {
-    setPendingItems(items => 
-      items.map(item => 
-        item.id === itemId 
-          ? { ...item, status: 'approved' }
-          : item
+    setPendingItems((items) =>
+      items.map((item) =>
+        item.id === itemId ? { ...item, status: "approved" } : item
       )
     );
-    toast.success('Item approved successfully!');
+    toast.success("Item approved successfully!");
   };
 
   const handleRejectItem = (itemId) => {
-    setPendingItems(items => 
-      items.map(item => 
-        item.id === itemId 
-          ? { ...item, status: 'rejected' }
-          : item
+    setPendingItems((items) =>
+      items.map((item) =>
+        item.id === itemId ? { ...item, status: "rejected" } : item
       )
     );
-    toast.error('Item rejected.');
+    toast.error("Item rejected.");
   };
 
   const handleRoleChange = (userId, newRole) => {
-    setUsers(users => 
-      users.map(user => 
-        user.id === userId 
-          ? { ...user, role: newRole }
-          : user
+    setUsers((users) =>
+      users.map((user) =>
+        user.id === userId ? { ...user, role: newRole } : user
       )
     );
     toast.success(`User role updated to ${newRole}`);
@@ -102,29 +228,48 @@ const AdminPanel = () => {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-light text-gray-900 mb-2">Admin Panel</h1>
-          <p className="text-gray-600">Manage items, users, and platform settings</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-light text-gray-900 mb-2">
+              Admin Panel
+            </h1>
+            <p className="text-gray-600">
+              Manage items, users, and platform settings
+            </p>
+          </div>
+          <button
+            onClick={handleAdminLogout}
+            className="bg-gray-100 text-gray-700 px-4 py-2 text-sm font-medium hover:bg-gray-200 transition-colors"
+          >
+            LOGOUT
+          </button>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="bg-gray-50 p-6 text-center">
-            <div className="text-2xl font-light text-gray-900 mb-1">{stats.totalUsers}</div>
+            <div className="text-2xl font-light text-gray-900 mb-1">
+              {stats.totalUsers}
+            </div>
             <div className="text-sm text-gray-600">Total Users</div>
           </div>
           <div className="bg-gray-50 p-6 text-center">
-            <div className="text-2xl font-light text-gray-900 mb-1">{stats.totalItems}</div>
+            <div className="text-2xl font-light text-gray-900 mb-1">
+              {stats.totalItems}
+            </div>
             <div className="text-sm text-gray-600">Total Items</div>
           </div>
           <div className="bg-gray-50 p-6 text-center">
-            <div className="text-2xl font-light text-gray-900 mb-1">{stats.pendingApprovals}</div>
+            <div className="text-2xl font-light text-gray-900 mb-1">
+              {stats.pendingApprovals}
+            </div>
             <div className="text-sm text-gray-600">Pending Approvals</div>
           </div>
           <div className="bg-gray-50 p-6 text-center">
-            <div className="text-2xl font-light text-gray-900 mb-1">{stats.totalExchanges}</div>
+            <div className="text-2xl font-light text-gray-900 mb-1">
+              {stats.totalExchanges}
+            </div>
             <div className="text-sm text-gray-600">Total Exchanges</div>
           </div>
         </div>
@@ -133,17 +278,17 @@ const AdminPanel = () => {
         <div className="mb-8">
           <nav className="flex space-x-8 border-b border-gray-200">
             {[
-              { id: 'pending', label: 'Pending Items' },
-              { id: 'users', label: 'User Management' },
-              { id: 'reports', label: 'Reports' }
+              { id: "pending", label: "Pending Items" },
+              { id: "users", label: "User Management" },
+              { id: "reports", label: "Reports" },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
                   activeTab === tab.id
-                    ? 'border-black text-black'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? "border-black text-black"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}
               >
                 {tab.label}
@@ -154,74 +299,91 @@ const AdminPanel = () => {
 
         {/* Tab Content */}
         <div>
-          {activeTab === 'pending' && (
+          {activeTab === "pending" && (
             <div>
-              <h2 className="text-xl font-light mb-6">Pending Item Approvals</h2>
-              
-              {pendingItems.filter(item => item.status === 'pending').length > 0 ? (
+              <h2 className="text-xl font-light mb-6">
+                Pending Item Approvals
+              </h2>
+
+              {pendingItems.filter((item) => item.status === "pending").length >
+              0 ? (
                 <div className="space-y-6">
-                  {pendingItems.filter(item => item.status === 'pending').map((item) => (
-                    <div key={item.id} className="border border-gray-200 p-6">
-                      <div className="flex flex-col lg:flex-row gap-6">
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          className="w-full lg:w-48 h-48 object-cover bg-gray-100"
-                        />
-                        
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start mb-4">
-                            <h3 className="text-lg font-medium">{item.title}</h3>
-                            <span className="bg-yellow-100 text-yellow-800 px-2 py-1 text-xs">
-                              PENDING
-                            </span>
-                          </div>
-                          
-                          <p className="text-gray-600 mb-4 text-sm">{item.description}</p>
-                          
-                          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 text-xs">
-                            <div>
-                              <span className="text-gray-500">Category:</span>
-                              <div className="font-medium">{item.category}</div>
+                  {pendingItems
+                    .filter((item) => item.status === "pending")
+                    .map((item) => (
+                      <div key={item.id} className="border border-gray-200 p-6">
+                        <div className="flex flex-col lg:flex-row gap-6">
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="w-full lg:w-48 h-48 object-cover bg-gray-100"
+                          />
+
+                          <div className="flex-1">
+                            <div className="flex justify-between items-start mb-4">
+                              <h3 className="text-lg font-medium">
+                                {item.title}
+                              </h3>
+                              <span className="bg-yellow-100 text-yellow-800 px-2 py-1 text-xs">
+                                PENDING
+                              </span>
                             </div>
-                            <div>
-                              <span className="text-gray-500">Size:</span>
-                              <div className="font-medium">{item.size}</div>
+
+                            <p className="text-gray-600 mb-4 text-sm">
+                              {item.description}
+                            </p>
+
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 text-xs">
+                              <div>
+                                <span className="text-gray-500">Category:</span>
+                                <div className="font-medium">
+                                  {item.category}
+                                </div>
+                              </div>
+                              <div>
+                                <span className="text-gray-500">Size:</span>
+                                <div className="font-medium">{item.size}</div>
+                              </div>
+                              <div>
+                                <span className="text-gray-500">
+                                  Condition:
+                                </span>
+                                <div className="font-medium">
+                                  {item.condition}
+                                </div>
+                              </div>
+                              <div>
+                                <span className="text-gray-500">Brand:</span>
+                                <div className="font-medium">{item.brand}</div>
+                              </div>
                             </div>
-                            <div>
-                              <span className="text-gray-500">Condition:</span>
-                              <div className="font-medium">{item.condition}</div>
+
+                            <div className="flex justify-between items-center mb-4 text-xs text-gray-500">
+                              <span>By: {item.uploadedBy}</span>
+                              <span>{item.location}</span>
+                              <span>
+                                {new Date(item.uploadedAt).toLocaleDateString()}
+                              </span>
                             </div>
-                            <div>
-                              <span className="text-gray-500">Brand:</span>
-                              <div className="font-medium">{item.brand}</div>
+
+                            <div className="flex space-x-3">
+                              <button
+                                onClick={() => handleApproveItem(item.id)}
+                                className="bg-black text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors"
+                              >
+                                APPROVE
+                              </button>
+                              <button
+                                onClick={() => handleRejectItem(item.id)}
+                                className="border border-gray-300 text-gray-700 px-6 py-2 text-sm font-medium hover:bg-gray-50 transition-colors"
+                              >
+                                REJECT
+                              </button>
                             </div>
-                          </div>
-                          
-                          <div className="flex justify-between items-center mb-4 text-xs text-gray-500">
-                            <span>By: {item.uploadedBy}</span>
-                            <span>{item.location}</span>
-                            <span>{new Date(item.uploadedAt).toLocaleDateString()}</span>
-                          </div>
-                          
-                          <div className="flex space-x-3">
-                            <button
-                              onClick={() => handleApproveItem(item.id)}
-                              className="bg-black text-white px-6 py-2 text-sm font-medium hover:bg-gray-800 transition-colors"
-                            >
-                              APPROVE
-                            </button>
-                            <button
-                              onClick={() => handleRejectItem(item.id)}
-                              className="border border-gray-300 text-gray-700 px-6 py-2 text-sm font-medium hover:bg-gray-50 transition-colors"
-                            >
-                              REJECT
-                            </button>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               ) : (
                 <div className="text-center py-16">
@@ -231,20 +393,32 @@ const AdminPanel = () => {
             </div>
           )}
 
-          {activeTab === 'users' && (
+          {activeTab === "users" && (
             <div>
               <h2 className="text-xl font-light mb-6">User Management</h2>
-              
+
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 text-sm font-medium text-gray-700">User</th>
-                      <th className="text-left py-3 text-sm font-medium text-gray-700">Email</th>
-                      <th className="text-left py-3 text-sm font-medium text-gray-700">Role</th>
-                      <th className="text-left py-3 text-sm font-medium text-gray-700">Items</th>
-                      <th className="text-left py-3 text-sm font-medium text-gray-700">Joined</th>
-                      <th className="text-left py-3 text-sm font-medium text-gray-700">Actions</th>
+                      <th className="text-left py-3 text-sm font-medium text-gray-700">
+                        User
+                      </th>
+                      <th className="text-left py-3 text-sm font-medium text-gray-700">
+                        Email
+                      </th>
+                      <th className="text-left py-3 text-sm font-medium text-gray-700">
+                        Role
+                      </th>
+                      <th className="text-left py-3 text-sm font-medium text-gray-700">
+                        Items
+                      </th>
+                      <th className="text-left py-3 text-sm font-medium text-gray-700">
+                        Joined
+                      </th>
+                      <th className="text-left py-3 text-sm font-medium text-gray-700">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -257,11 +431,13 @@ const AdminPanel = () => {
                           {user.email}
                         </td>
                         <td className="py-3">
-                          <span className={`text-xs px-2 py-1 rounded ${
-                            user.role === 'admin' 
-                              ? 'bg-black text-white' 
-                              : 'bg-gray-100 text-gray-800'
-                          }`}>
+                          <span
+                            className={`text-xs px-2 py-1 rounded ${
+                              user.role === "admin"
+                                ? "bg-black text-white"
+                                : "bg-gray-100 text-gray-800"
+                            }`}
+                          >
                             {user.role.toUpperCase()}
                           </span>
                         </td>
@@ -274,7 +450,9 @@ const AdminPanel = () => {
                         <td className="py-3">
                           <select
                             value={user.role}
-                            onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                            onChange={(e) =>
+                              handleRoleChange(user.id, e.target.value)
+                            }
                             className="text-xs border border-gray-300 px-2 py-1 focus:outline-none focus:border-gray-500"
                           >
                             <option value="user">User</option>
@@ -289,24 +467,30 @@ const AdminPanel = () => {
             </div>
           )}
 
-          {activeTab === 'reports' && (
+          {activeTab === "reports" && (
             <div>
               <h2 className="text-xl font-light mb-6">Platform Reports</h2>
-              
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="border border-gray-200 p-6">
                   <h3 className="font-medium mb-4">Recent Activity</h3>
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Items uploaded today:</span>
+                      <span className="text-gray-600">
+                        Items uploaded today:
+                      </span>
                       <span className="font-medium">12</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">Exchanges completed:</span>
+                      <span className="text-gray-600">
+                        Exchanges completed:
+                      </span>
                       <span className="font-medium">8</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-600">New users registered:</span>
+                      <span className="text-gray-600">
+                        New users registered:
+                      </span>
                       <span className="font-medium">5</span>
                     </div>
                   </div>

@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { SignInButton, useAuth, UserButton } from '@clerk/clerk-react';
-import { assets } from '../assets/data';
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { SignInButton, useAuth, UserButton } from "@clerk/clerk-react";
+import { assets } from "../assets/data";
 
 const Navbar = () => {
   const { isSignedIn } = useAuth();
@@ -9,7 +9,9 @@ const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isActive = (path) => {
-    return location.pathname === path ? 'text-gray-900 border-b-2 border-gray-900' : 'text-gray-600 hover:text-gray-900';
+    return location.pathname === path
+      ? "text-gray-900 border-b-2 border-gray-900"
+      : "text-gray-600 hover:text-gray-900";
   };
 
   return (
@@ -25,27 +27,45 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link to="/" className={`py-2 px-1 text-sm font-medium transition-colors ${isActive('/')}`}>
+            <Link
+              to="/"
+              className={`py-2 px-1 text-sm font-medium transition-colors ${isActive(
+                "/"
+              )}`}
+            >
               HOME
             </Link>
-            <Link to="/browse" className={`py-2 px-1 text-sm font-medium transition-colors ${isActive('/browse')}`}>
+            <Link
+              to="/browse"
+              className={`py-2 px-1 text-sm font-medium transition-colors ${isActive(
+                "/browse"
+              )}`}
+            >
               COLLECTION
             </Link>
-            {isSignedIn && (
-              <>
-                <Link to="/add-item" className={`py-2 px-1 text-sm font-medium transition-colors ${isActive('/add-item')}`}>
-                  SHARE
-                </Link>
-                <Link to="/dashboard" className={`py-2 px-1 text-sm font-medium transition-colors ${isActive('/dashboard')}`}>
-                  ACCOUNT
-                </Link>
-              </>
-            )}
-            <Link to="/browse" className="text-gray-600 hover:text-gray-900">
-              ABOUT
+            <Link
+              to="/dashboard"
+              className={`py-2 px-1 text-sm font-medium transition-colors ${isActive(
+                "/dashboard"
+              )}`}
+            >
+              DASHBOARD
             </Link>
-            <Link to="/browse" className="text-gray-600 hover:text-gray-900">
-              CONTACT
+            <Link
+              to="/history"
+              className={`py-2 px-1 text-sm font-medium transition-colors ${isActive(
+                "/history"
+              )}`}
+            >
+              HISTORY
+            </Link>
+            <Link
+              to="/admin"
+              className={`py-2 px-1 text-sm font-medium transition-colors ${isActive(
+                "/admin"
+              )}`}
+            >
+              ADMIN
             </Link>
           </div>
 
@@ -56,18 +76,26 @@ const Navbar = () => {
               <img src={assets.search_icon} alt="Search" className="w-5 h-5" />
             </button>
 
-            {/* Cart/Exchange Icon */}
-            <Link to="/browse" className="text-gray-600 hover:text-gray-900 relative">
-              <img src={assets.exchange_icon} alt="Exchange" className="w-5 h-5" />
+            {/* Cart Icon with count */}
+            <Link
+              to="/cart"
+              className="text-gray-600 hover:text-gray-900 relative"
+            >
+              <img src={assets.cart_icon} alt="Cart" className="w-5 h-5" />
+              <span className="absolute -top-2 -right-2 bg-black text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                0
+              </span>
             </Link>
 
             {/* User Authentication */}
             {isSignedIn ? (
-              <UserButton afterSignOutUrl="/" />
+              <div className="flex items-center space-x-2">
+                <UserButton afterSignOutUrl="/" />
+              </div>
             ) : (
               <SignInButton mode="modal">
-                <button className="text-gray-600 hover:text-gray-900">
-                  <img src={assets.profile_icon} alt="Login" className="w-5 h-5" />
+                <button className="bg-black text-white px-4 py-2 text-sm font-medium hover:bg-gray-800 transition-colors">
+                  LOGIN
                 </button>
               </SignInButton>
             )}
@@ -86,51 +114,47 @@ const Navbar = () => {
         {mobileMenuOpen && (
           <div className="md:hidden border-t border-gray-200 py-4">
             <div className="flex flex-col space-y-4">
-              <Link 
-                to="/" 
+              <Link
+                to="/"
                 className="text-gray-600 hover:text-gray-900 text-sm font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 HOME
               </Link>
-              <Link 
-                to="/browse" 
+              <Link
+                to="/browse"
                 className="text-gray-600 hover:text-gray-900 text-sm font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 COLLECTION
               </Link>
-              {isSignedIn && (
-                <>
-                  <Link 
-                    to="/add-item" 
-                    className="text-gray-600 hover:text-gray-900 text-sm font-medium"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    SHARE
-                  </Link>
-                  <Link 
-                    to="/dashboard" 
-                    className="text-gray-600 hover:text-gray-900 text-sm font-medium"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    ACCOUNT
-                  </Link>
-                </>
-              )}
-              <Link 
-                to="/browse" 
+              <Link
+                to="/dashboard"
                 className="text-gray-600 hover:text-gray-900 text-sm font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                ABOUT
+                DASHBOARD
               </Link>
-              <Link 
-                to="/browse" 
+              <Link
+                to="/history"
                 className="text-gray-600 hover:text-gray-900 text-sm font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                CONTACT
+                HISTORY
+              </Link>
+              <Link
+                to="/admin"
+                className="text-gray-600 hover:text-gray-900 text-sm font-medium"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                ADMIN
+              </Link>
+              <Link
+                to="/cart"
+                className="text-gray-600 hover:text-gray-900 text-sm font-medium"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                CART
               </Link>
             </div>
           </div>

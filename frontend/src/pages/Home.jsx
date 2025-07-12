@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { useAuth } from "@clerk/clerk-react";
 import ItemCard from "../components/ItemCard";
 import ScrollVelocity from "../animations/ScrollVelocity";
+import Carousel from "../components/Carousel";
+import ImpactSection from "../components/ImpactSection";
 import {
   assets,
   featuredItems,
@@ -15,44 +17,8 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="relative bg-pink-50 min-h-[500px] flex items-center">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          <div className="space-y-6">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-light text-gray-900 leading-tight">
-              ReWear
-            </h1>
-            <h2 className="text-2xl md:text-3xl font-light text-gray-700">
-              Community Clothing Exchange
-            </h2>
-            <p className="text-lg text-gray-600 max-w-md">
-              Exchange unused clothing through direct swaps or our point-based
-              system. Promote sustainable fashion and reduce textile waste.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                to="/browse"
-                className="bg-black text-white px-8 py-3 text-sm font-medium hover:bg-gray-800 transition-colors text-center"
-              >
-                START SWAPPING
-              </Link>
-              <Link
-                to="/browse"
-                className="border border-black text-black px-8 py-3 text-sm font-medium hover:bg-black hover:text-white transition-colors text-center"
-              >
-                BROWSE ITEMS
-              </Link>
-            </div>
-          </div>
-          <div className="hidden lg:block">
-            <img
-              src={assets.hero_img}
-              alt="Sustainable Fashion"
-              className="w-full h-auto max-w-lg mx-auto"
-            />
-          </div>
-        </div>
-      </section>
+      {/* Hero Carousel */}
+      <Carousel />
 
       {/* Latest Collections */}
       <section className="py-16">
@@ -89,6 +55,9 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      {/* Impact Section */}
+      <ImpactSection />
 
       {/* Features Section */}
       <section className="py-16">

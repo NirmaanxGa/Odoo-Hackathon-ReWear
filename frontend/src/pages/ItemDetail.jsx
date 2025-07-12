@@ -3,8 +3,9 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { useUserContext } from "../context/UserContext";
 import { useAuth, useUser } from "@clerk/clerk-react";
 import { toast } from "react-toastify";
-import { reWearItems } from "../assets/data";
+import { allItems } from "../assets/data";
 import LoadingSpinner from "../components/LoadingSpinner";
+import PaymentModal from "../components/PaymentModal";
 
 const ItemDetail = () => {
   const { id } = useParams();
@@ -17,9 +18,15 @@ const ItemDetail = () => {
   const [showExchangeModal, setShowExchangeModal] = useState(false);
   const [selectedExchangeItem, setSelectedExchangeItem] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   // Find item by ID or show error
-  const item = reWearItems.find((item) => item.id === id);
+  const item = allItems.find((item) => item.id === id);
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
 
   if (!item) {
     return (
@@ -72,25 +79,13 @@ const ItemDetail = () => {
       return;
     }
 
-    setIsProcessing(true);
-    toast.info("Processing payment...", { autoClose: 1500 });
+    // Show payment modal instead of direct payment
+    setShowPaymentModal(true);
+  };
 
+  const handlePaymentSuccess = async (paymentData) => {
     try {
-      // Simulate Clerk payment process - In real app, this would be actual Clerk payment
-      const paymentData = {
-        amount: item.price * 100, // Convert to cents
-        currency: "inr",
-        customer_email: user?.emailAddresses[0]?.emailAddress,
-        item_id: item.id,
-        item_title: item.title,
-        size: selectedSize,
-        customer_name: user?.fullName || user?.firstName || "Customer",
-      };
-
-      // Simulate payment processing delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Simulate successful payment
+      // Create purchase details
       const purchaseDetails = {
         ...item,
         purchaseId: `PUR_${Date.now()}`,
@@ -101,11 +96,11 @@ const ItemDetail = () => {
         customerName: user?.fullName || user?.firstName || "Customer",
       };
 
-      // Add to purchase history immediately
+      // Add to purchase history
       addPurchase(purchaseDetails);
 
-      // Show success immediately
-      toast.success("Purchase successful! You earned 200 FOREVER points!", {
+      // Show success message
+      toast.success("Purchase successful! You earned 200 ReWear points!", {
         autoClose: 3000,
       });
 
@@ -114,10 +109,8 @@ const ItemDetail = () => {
         navigate("/dashboard");
       }, 2000);
     } catch (error) {
-      console.error("Payment failed:", error);
-      toast.error("Payment failed. Please try again.");
-    } finally {
-      setIsProcessing(false);
+      console.error("Purchase processing failed:", error);
+      toast.error("Purchase processing failed. Please contact support.");
     }
   };
 
@@ -233,11 +226,33 @@ const ItemDetail = () => {
           {/* Image Gallery */}
           <div>
             <div className="mb-4">
-              <img
-                src={item.images ? item.images[selectedImage] : item.image}
-                alt={item.title}
-                className="w-full h-[600px] object-cover bg-gray-100"
-              />
+              {!imageError ? (
+                <img
+                  src={item.images ? item.images[selectedImage] : item.image}
+                  alt={item.title}
+                  className="w-full h-[600px] object-cover bg-gray-100"
+                  onError={handleImageError}
+                />
+              ) : (
+                <div className="w-full h-[600px] bg-gray-100 flex items-center justify-center">
+                  <div className="text-center text-gray-400">
+                    <svg
+                      className="w-24 h-24 mx-auto mb-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1}
+                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    <p className="text-lg">Image not available</p>
+                  </div>
+                </div>
+              )}
             </div>
 
             {item.images && item.images.length > 1 && (
@@ -360,21 +375,9 @@ const ItemDetail = () => {
                   {item.availableFor?.purchase && (
                     <button
                       onClick={handlePurchase}
-                      disabled={isProcessing}
-                      className={`w-full py-4 px-8 text-sm font-semibold tracking-wide transition-all duration-300 ${
-                        isProcessing
-                          ? "bg-gray-400 text-white cursor-not-allowed"
-                          : "bg-gradient-to-r from-gray-900 to-black text-white hover:from-black hover:to-gray-800 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
-                      }`}
+                      className="w-full py-4 px-8 text-sm font-semibold tracking-wide transition-all duration-300 bg-gradient-to-r from-gray-900 to-black text-white hover:from-black hover:to-gray-800 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                     >
-                      {isProcessing ? (
-                        <div className="flex items-center justify-center">
-                          <LoadingSpinner size="small" text="" />
-                          <span className="ml-2">PROCESSING PAYMENT...</span>
-                        </div>
-                      ) : (
-                        <>BUY NOW - ₹{item.price}</>
-                      )}
+                      BUY NOW - ₹{item.price}
                     </button>
                   )}
 
@@ -429,7 +432,7 @@ const ItemDetail = () => {
                   <li>
                     • Secure payments processed through Clerk authentication
                   </li>
-                  <li>• Earn 200 FOREVER points with every purchase</li>
+                  <li>• Earn 200 ReWear points with every purchase</li>
                   <li>• All exchanges are facilitated through our platform</li>
                   <li>• Items are verified for quality and authenticity</li>
                   <li>• Free local pickup and delivery in most areas</li>
@@ -442,7 +445,7 @@ const ItemDetail = () => {
                 </h4>
                 <ul className="space-y-1">
                   <li>• Get 200 points instantly on purchase completion</li>
-                  <li>• Redeem points for exclusive FOREVER merchandise</li>
+                  <li>• Redeem points for exclusive ReWear merchandise</li>
                   <li>• Track all your transactions in the dashboard</li>
                   <li>• Exchange only with verified community members</li>
                 </ul>
@@ -628,6 +631,15 @@ const ItemDetail = () => {
             </div>
           </div>
         )}
+
+        {/* Payment Modal */}
+        <PaymentModal
+          isOpen={showPaymentModal}
+          onClose={() => setShowPaymentModal(false)}
+          item={item}
+          selectedSize={selectedSize}
+          onPaymentSuccess={handlePaymentSuccess}
+        />
       </div>
     </div>
   );

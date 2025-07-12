@@ -24,6 +24,7 @@ import AdminPanel from "./pages/AdminPanel";
 import Cart from "./pages/Cart";
 import History from "./pages/History";
 import Rewards from "./pages/Rewards";
+import StatusPage from "./pages/StatusPage";
 
 const AppContent = () => {
   const { isLoading: dynamicLoading } = useLoading();
@@ -55,6 +56,9 @@ const AppContent = () => {
                 </ProtectedRoute>
               }
             />
+
+            {/* Status Page */}
+            <Route path="/status" element={<StatusPage />} />
 
             {/* 404 Page */}
             <Route

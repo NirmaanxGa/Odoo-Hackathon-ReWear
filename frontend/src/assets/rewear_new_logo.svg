@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 100">
+  <defs>
+    <style>
+      .logo-text { fill: #2c2c2c; font-family: Arial, sans-serif; font-size: 36px; font-weight: bold; }
+      .accent-dot { fill: #b091a3; }
+    </style>
+  </defs>
+  
+  <!-- REWEAR Text -->
+  <text x="20" y="65" class="logo-text">REWEAR</text>
+  
+  <!-- Pink accent dot -->
+  <circle cx="470" cy="55" r="12" class="accent-dot"/>
+</svg>

@@ -134,7 +134,7 @@ const Dashboard = () => {
               Redeem Rewards
             </div>
             <div className="text-sm text-green-600">
-              Use {pointsBalance} points for FOREVER items
+              Use {pointsBalance} points for ReWear items
             </div>
           </Link>
         </div>

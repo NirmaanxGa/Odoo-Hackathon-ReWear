@@ -15,6 +15,59 @@ const AdminPanel = () => {
     password: "",
   });
 
+  // Move all state hooks to the top - before any conditional returns
+  // Dummy pending items for approval
+  const [pendingItems, setPendingItems] = useState([
+    {
+      id: 201,
+      title: "Vintage Leather Boots",
+      description: "Classic brown leather boots in great condition.",
+      image: "https://via.placeholder.com/150x200?text=Boots",
+      size: "10",
+      category: "Shoes",
+      condition: "Very Good",
+      brand: "Clarks",
+      location: "Boston, MA",
+      uploadedBy: "John D.",
+      uploadedAt: "2025-01-10T10:30:00Z",
+      status: "pending",
+    },
+    {
+      id: 202,
+      title: "Designer Silk Scarf",
+      description: "Beautiful silk scarf with floral pattern.",
+      image: "https://via.placeholder.com/150x200?text=Scarf",
+      size: "One Size",
+      category: "Accessories",
+      condition: "Like New",
+      brand: "Hermès",
+      location: "New York, NY",
+      uploadedBy: "Emma K.",
+      uploadedAt: "2025-01-10T14:15:00Z",
+      status: "pending",
+    },
+  ]);
+
+  // Dummy users for role management
+  const [users, setUsers] = useState([
+    {
+      id: 1,
+      name: "John Doe",
+      email: "john@example.com",
+      role: "user",
+      joinedAt: "2024-12-15",
+      itemsUploaded: 12,
+    },
+    {
+      id: 2,
+      name: "Emma Smith",
+      email: "emma@example.com",
+      role: "user",
+      joinedAt: "2024-11-20",
+      itemsUploaded: 8,
+    },
+  ]);
+
   const handleAdminLogin = (e) => {
     e.preventDefault();
 
@@ -36,6 +89,42 @@ const AdminPanel = () => {
   const handleAdminLogout = () => {
     setIsAdminLoggedIn(false);
     toast.info("Admin logged out");
+  };
+
+  const handleApproveItem = (itemId) => {
+    setPendingItems((items) =>
+      items.map((item) =>
+        item.id === itemId ? { ...item, status: "approved" } : item
+      )
+    );
+    toast.success("Item approved successfully!");
+  };
+
+  const handleRejectItem = (itemId) => {
+    setPendingItems((items) =>
+      items.map((item) =>
+        item.id === itemId ? { ...item, status: "rejected" } : item
+      )
+    );
+    toast.error("Item rejected.");
+  };
+
+  const handleRoleChange = (userId, newRole) => {
+    setUsers((users) =>
+      users.map((user) =>
+        user.id === userId ? { ...user, role: newRole } : user
+      )
+    );
+    toast.success(`User role updated to ${newRole}`);
+  };
+
+  // Stats calculation
+  const stats = {
+    totalUsers: users.length + 150,
+    totalItems: 45,
+    pendingApprovals: pendingItems.filter((item) => item.status === "pending")
+      .length,
+    totalExchanges: 89,
   };
 
   // If not admin logged in, show admin login
@@ -136,94 +225,6 @@ const AdminPanel = () => {
       </div>
     );
   }
-
-  // Dummy pending items for approval
-  const [pendingItems, setPendingItems] = useState([
-    {
-      id: 201,
-      title: "Vintage Leather Boots",
-      description: "Classic brown leather boots in great condition.",
-      image: "https://via.placeholder.com/150x200?text=Boots",
-      size: "10",
-      category: "Shoes",
-      condition: "Very Good",
-      brand: "Clarks",
-      location: "Boston, MA",
-      uploadedBy: "John D.",
-      uploadedAt: "2025-01-10T10:30:00Z",
-      status: "pending",
-    },
-    {
-      id: 202,
-      title: "Designer Silk Scarf",
-      description: "Beautiful silk scarf with floral pattern.",
-      image: "https://via.placeholder.com/150x200?text=Scarf",
-      size: "One Size",
-      category: "Accessories",
-      condition: "Like New",
-      brand: "Hermès",
-      location: "New York, NY",
-      uploadedBy: "Emma K.",
-      uploadedAt: "2025-01-10T14:15:00Z",
-      status: "pending",
-    },
-  ]);
-
-  // Dummy users for role management
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      role: "user",
-      joinedAt: "2024-12-15",
-      itemsUploaded: 12,
-    },
-    {
-      id: 2,
-      name: "Emma Smith",
-      email: "emma@example.com",
-      role: "user",
-      joinedAt: "2024-11-20",
-      itemsUploaded: 8,
-    },
-  ]);
-
-  // Stats
-  const stats = {
-    totalUsers: users.length + 150,
-    totalItems: 45,
-    pendingApprovals: pendingItems.filter((item) => item.status === "pending")
-      .length,
-    totalExchanges: 89,
-  };
-
-  const handleApproveItem = (itemId) => {
-    setPendingItems((items) =>
-      items.map((item) =>
-        item.id === itemId ? { ...item, status: "approved" } : item
-      )
-    );
-    toast.success("Item approved successfully!");
-  };
-
-  const handleRejectItem = (itemId) => {
-    setPendingItems((items) =>
-      items.map((item) =>
-        item.id === itemId ? { ...item, status: "rejected" } : item
-      )
-    );
-    toast.error("Item rejected.");
-  };
-
-  const handleRoleChange = (userId, newRole) => {
-    setUsers((users) =>
-      users.map((user) =>
-        user.id === userId ? { ...user, role: newRole } : user
-      )
-    );
-    toast.success(`User role updated to ${newRole}`);
-  };
 
   return (
     <div className="min-h-screen bg-white">

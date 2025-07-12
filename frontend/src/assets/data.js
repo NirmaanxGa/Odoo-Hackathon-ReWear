@@ -1,7 +1,7 @@
 import { assets, products } from "./frontend_assets/assets.js";
 
-// Transform products data for ReWear (clean exchange platform)
-export const reWearItems = products.slice(0, 20).map((product, index) => ({
+// Transform ALL products data for ReWear (clean exchange platform) - Using all 52 products
+export const reWearItems = products.map((product, index) => ({
   id: product._id,
   title: product.name,
   description: product.description,
@@ -10,11 +10,17 @@ export const reWearItems = products.slice(0, 20).map((product, index) => ({
   size: product.sizes[0], // Use first available size
   sizes: product.sizes,
   category: product.subCategory,
-  type: ["Casual", "Formal", "Party", "Everyday"][index % 4],
+  type: ["Casual", "Formal", "Party", "Everyday", "Vintage", "Designer"][
+    index % 6
+  ],
   condition: ["Like New", "Excellent", "Very Good", "Good"][index % 4],
   // Indian pricing in INR for direct purchase
-  price: [149, 299, 399, 199, 249, 349, 179, 229, 319, 159][index % 10],
-  originalPrice: [299, 599, 799, 399, 499, 699, 359, 459, 639, 319][index % 10],
+  price: [
+    149, 299, 399, 199, 249, 349, 179, 229, 319, 159, 279, 449, 189, 329, 259,
+  ][index % 15],
+  originalPrice: [
+    299, 599, 799, 399, 499, 699, 359, 459, 639, 319, 559, 899, 379, 659, 519,
+  ][index % 15],
   location: [
     "Mumbai, Maharashtra",
     "Delhi, NCR",
@@ -24,7 +30,11 @@ export const reWearItems = products.slice(0, 20).map((product, index) => ({
     "Pune, Maharashtra",
     "Kolkata, West Bengal",
     "Ahmedabad, Gujarat",
-  ][index % 8],
+    "Jaipur, Rajasthan",
+    "Lucknow, Uttar Pradesh",
+    "Indore, Madhya Pradesh",
+    "Kochi, Kerala",
+  ][index % 12],
   uploadedBy: [
     "Priya S.",
     "Raj P.",
@@ -34,13 +44,17 @@ export const reWearItems = products.slice(0, 20).map((product, index) => ({
     "Arjun R.",
     "Kavya L.",
     "Rohit G.",
-  ][index % 8],
+    "Meera D.",
+    "Akash K.",
+    "Riya M.",
+    "Dev S.",
+  ][index % 12],
   uploadedAt: new Date(product.date).toISOString(),
   bestseller: product.bestseller,
   // Each purchase earns user 200 points
   pointsEarned: 200, // Fixed points per purchase
-  // Clean status system
-  status: ["available", "reserved", "sold"][Math.floor(Math.random() * 3)],
+  // Clean status system - Most items should be available for testing
+  status: index < 5 ? "sold" : index < 8 ? "reserved" : "available", // Only first 5 sold, next 3 reserved, rest available
   swapRequests: Math.floor(Math.random() * 3), // Number of exchange requests
   // Item can be purchased or exchanged
   availableFor: {
@@ -49,64 +63,86 @@ export const reWearItems = products.slice(0, 20).map((product, index) => ({
   },
 }));
 
-// FOREVER Special Rewards - Redeemable with points
+// ReWear Special Rewards - Redeemable with points
 export const rewardsItems = [
   {
     id: "reward_1",
-    title: "FOREVER Cap",
-    description: "Premium quality cap with FOREVER branding",
-    image: assets.logo, // Using logo as placeholder
+    title: "ReWear Cap",
+    description: "Premium quality cap with ReWear branding",
+    image: assets.cap_img,
     pointsRequired: 600,
     category: "Accessories",
     inStock: true,
   },
   {
     id: "reward_2",
-    title: "FOREVER T-Shirt",
-    description: "Exclusive FOREVER branded cotton t-shirt",
-    image: assets.logo,
+    title: "ReWear T-Shirt",
+    description: "Exclusive ReWear branded cotton t-shirt",
+    image: assets.tshirt_img,
     pointsRequired: 1000,
     category: "Clothing",
     inStock: true,
   },
   {
     id: "reward_3",
-    title: "FOREVER Tote Bag",
-    description: "Sustainable canvas tote bag with FOREVER logo",
-    image: assets.logo,
+    title: "ReWear Tote Bag",
+    description: "Sustainable canvas tote bag with ReWear logo",
+    image: assets.totebag_img,
     pointsRequired: 800,
     category: "Accessories",
     inStock: true,
   },
   {
     id: "reward_4",
-    title: "FOREVER Water Bottle",
+    title: "ReWear Water Bottle",
     description: "Eco-friendly steel water bottle",
-    image: assets.logo,
+    image: assets.waterbottle_img,
     pointsRequired: 1200,
     category: "Lifestyle",
     inStock: true,
   },
   {
     id: "reward_5",
-    title: "FOREVER Premium Hoodie",
+    title: "ReWear Premium Hoodie",
     description: "Limited edition premium hoodie",
-    image: assets.logo,
+    image: assets.hoodie_img,
     pointsRequired: 2000,
     category: "Clothing",
     inStock: true,
   },
 ];
 
-// Featured items for homepage
-export const featuredItems = reWearItems.slice(0, 8);
+// Featured items for homepage - More diverse selection
+export const featuredItems = reWearItems.slice(0, 12);
 
-// Latest arrivals
-export const latestArrivals = reWearItems.slice(8, 18);
+// Latest arrivals - More items for better showcase
+export const latestArrivals = reWearItems.slice(12, 28);
 
-// Best sellers
+// Best sellers - Enhanced selection
 export const bestSellers = reWearItems
   .filter((item) => item.bestseller)
-  .slice(0, 10);
+  .slice(0, 16);
+
+// Category-specific exports for better filtering
+export const menItems = reWearItems.filter(
+  (item) =>
+    item.category === "Topwear" ||
+    item.category === "Bottomwear" ||
+    item.category === "Winterwear"
+);
+
+export const womenItems = reWearItems.filter(
+  (item) =>
+    item.category === "Topwear" ||
+    item.category === "Bottomwear" ||
+    item.category === "Winterwear"
+);
+
+export const kidsItems = reWearItems.filter(
+  (item) => item.category === "Topwear" || item.category === "Bottomwear"
+);
+
+// Export all items for pagination
+export { reWearItems as allItems };
 
 export { assets };

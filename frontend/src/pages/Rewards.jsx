@@ -35,10 +35,10 @@ const Rewards = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-light text-gray-900 mb-2">
-            FOREVER Rewards
+            ReWear Rewards
           </h1>
           <p className="text-gray-600">
-            Redeem your points for exclusive FOREVER merchandise
+            Redeem your points for exclusive ReWear merchandise
           </p>
           <div className="mt-4 bg-gray-50 p-4 rounded">
             <p className="text-lg font-medium">
@@ -51,13 +51,16 @@ const Rewards = () => {
         {/* Rewards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {rewardsItems.map((reward) => (
-            <div key={reward.id} className="border border-gray-200 bg-white">
+            <div
+              key={reward.id}
+              className="border border-gray-200 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
+            >
               <div className="p-6">
-                <div className="w-full h-48 bg-gray-100 mb-4 flex items-center justify-center">
+                <div className="w-full h-48 bg-gray-100 mb-4 flex items-center justify-center overflow-hidden rounded-lg">
                   <img
                     src={reward.image}
                     alt={reward.title}
-                    className="w-16 h-16 object-contain"
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   />
                 </div>
 
@@ -83,9 +86,9 @@ const Rewards = () => {
                   disabled={
                     pointsBalance < reward.pointsRequired || !reward.inStock
                   }
-                  className={`w-full py-2 px-4 text-sm font-medium transition-colors ${
+                  className={`w-full py-3 px-4 text-sm font-medium transition-all duration-200 rounded-lg ${
                     pointsBalance >= reward.pointsRequired && reward.inStock
-                      ? "bg-black text-white hover:bg-gray-800"
+                      ? "bg-black text-white hover:bg-gray-800 hover:shadow-md transform hover:-translate-y-0.5"
                       : "bg-gray-300 text-gray-500 cursor-not-allowed"
                   }`}
                 >

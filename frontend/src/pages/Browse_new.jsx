@@ -94,7 +94,7 @@ const Browse = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -193,7 +193,8 @@ const Browse = () => {
         <div className="mb-6">
           <p className="text-sm text-gray-600">
             Showing {currentItems.length} of {sortedItems.length} products
-            {sortedItems.length !== allItems.length && ` (${allItems.length} total)`}
+            {sortedItems.length !== allItems.length &&
+              ` (${allItems.length} total)`}
           </p>
         </div>
 
